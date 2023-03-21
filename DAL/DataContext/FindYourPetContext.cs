@@ -15,10 +15,13 @@ public class FindYourPetContext : DbContext
     }
 
     public virtual DbSet<User> Users { get; set; }
+
     public virtual DbSet<Pet> Pets { get; set; }
+
     public virtual DbSet<Post> Posts { get; set; }
+
     public virtual DbSet<Image> Images { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -161,5 +164,4 @@ public class FindYourPetContext : DbContext
                 .HasConstraintName("fc_pet");
         });
     }
-
 }
