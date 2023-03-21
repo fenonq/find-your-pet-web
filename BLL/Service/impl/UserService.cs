@@ -1,7 +1,7 @@
-﻿using DAL.Model;
-using DAL.Repository;
+﻿namespace BLL.Service.impl;
 
-namespace BLL.Service.impl;
+using DAL.Model;
+using DAL.Repository;
 
 public class UserService : IUserService
 {

@@ -5,6 +5,8 @@ using DAL.Model;
 using DAL.Repository;
 using DAL.Repository.impl;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +22,21 @@ builder.Services.AddScoped<IEntityRepository<Pet>, PetRepository>();
 builder.Services.AddScoped<IEntityRepository<Post>, PostRepository>();
 builder.Services.AddScoped<IEntityRepository<User>, UserRepository>();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+connectionString = connectionString!.Replace("DbPassword", builder.Configuration["DbPassword"]);
+
 builder.Services.AddDbContext<FindYourPetContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
+
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+
+    // .WriteTo.Console(new CompactJsonFormatter())
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
 

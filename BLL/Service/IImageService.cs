@@ -1,6 +1,6 @@
-﻿using DAL.Model;
+﻿namespace BLL.Service;
 
-namespace BLL.Service;
+using DAL.Model;
 
 public interface IImageService
 {

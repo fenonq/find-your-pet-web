@@ -1,7 +1,7 @@
-﻿using DAL.DataContext;
-using DAL.Model;
+﻿namespace DAL.Repository.impl;
 
-namespace DAL.Repository.impl;
+using DataContext;
+using Model;
 
 public class ImageRepository : IEntityRepository<Image>
 {
@@ -9,37 +9,37 @@ public class ImageRepository : IEntityRepository<Image>
 
     public ImageRepository(FindYourPetContext context)
     {
-        _context = context;
+        this._context = context;
     }
 
     public IQueryable<Image> FindAll()
     {
-        return _context.Images;
+        return this._context.Images;
     }
 
     public Image? FindById(int id)
     {
-        return _context.Images.Find(id);
+        return this._context.Images.Find(id);
     }
 
     public void Add(Image image)
     {
-        _context.Images.Add(image);
-        _context.SaveChanges();
+        this._context.Images.Add(image);
+        this._context.SaveChanges();
     }
 
     public void Update(Image image)
     {
-        _context.Images.Update(image);
-        _context.SaveChanges();
+        this._context.Images.Update(image);
+        this._context.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var image = _context.Images.Find(id);
+        var image = this._context.Images.Find(id);
 
         if (image == null) return;
-        _context.Images.Remove(image);
-        _context.SaveChanges();
+        this._context.Images.Remove(image);
+        this._context.SaveChanges();
     }
 }

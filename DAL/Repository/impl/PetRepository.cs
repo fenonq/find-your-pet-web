@@ -1,7 +1,7 @@
-﻿using DAL.DataContext;
-using DAL.Model;
+﻿namespace DAL.Repository.impl;
 
-namespace DAL.Repository.impl;
+using DataContext;
+using Model;
 
 public class PetRepository : IEntityRepository<Pet>
 {
@@ -9,37 +9,37 @@ public class PetRepository : IEntityRepository<Pet>
 
     public PetRepository(FindYourPetContext context)
     {
-        _context = context;
+        this._context = context;
     }
 
     public IQueryable<Pet> FindAll()
     {
-        return _context.Pets;
+        return this._context.Pets;
     }
 
     public Pet? FindById(int id)
     {
-        return _context.Pets.Find(id);
+        return this._context.Pets.Find(id);
     }
 
     public void Add(Pet pet)
     {
-        _context.Pets.Add(pet);
-        _context.SaveChanges();
+        this._context.Pets.Add(pet);
+        this._context.SaveChanges();
     }
 
     public void Update(Pet pet)
     {
-        _context.Pets.Update(pet);
-        _context.SaveChanges();
+        this._context.Pets.Update(pet);
+        this._context.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var pet = _context.Pets.Find(id);
+        var pet = this._context.Pets.Find(id);
 
         if (pet == null) return;
-        _context.Pets.Remove(pet);
-        _context.SaveChanges();
+        this._context.Pets.Remove(pet);
+        this._context.SaveChanges();
     }
 }

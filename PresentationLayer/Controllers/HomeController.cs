@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
+﻿namespace PresentationLayer.Controllers;
+
+using System.Diagnostics;
 using BLL.Service;
 using Microsoft.AspNetCore.Mvc;
-using PresentationLayer.Models;
-
-namespace PresentationLayer.Controllers;
+using Models;
 
 public class HomeController : Controller
 {
@@ -12,14 +12,15 @@ public class HomeController : Controller
 
     public HomeController(ILogger<HomeController> logger, IUserService userService)
     {
-        _logger = logger;
-        _userService = userService;
+        this._logger = logger;
+        this._userService = userService;
     }
 
     public IActionResult Index()
     {
-        _userService.RegisterUser("Taras", "Fenyk", "Taras", "1234");
-        ViewBag.User = _userService.FindAll()[0].Name;
+        this._logger.LogInformation("Test information..");
+        this._userService.RegisterUser("Taras", "Fenyk", "Taras", "1234");
+        this.ViewBag.User = this._userService.FindAll()[0].Name;
         return View();
     }
 

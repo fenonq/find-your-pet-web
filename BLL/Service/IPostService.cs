@@ -1,12 +1,19 @@
-﻿using DAL.Model;
-using DAL.Model.Enum;
+﻿namespace BLL.Service;
 
-namespace BLL.Service;
+using DAL.Model;
+using DAL.Model.Enum;
 
 public interface IPostService
 {
-    void Add(DateTime lostDate, string location, string contactNumber,
-        PostType type, DateTime createdAt, bool isActive, int petId, int userId);
+    void Add(
+        DateTime lostDate,
+        string location,
+        string contactNumber,
+        PostType type,
+        DateTime createdAt,
+        bool isActive,
+        int petId,
+        int userId);
 
     void ChangeVisibility(int postId);
 

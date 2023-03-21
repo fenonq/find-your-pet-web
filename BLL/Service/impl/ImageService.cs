@@ -1,7 +1,7 @@
-﻿using DAL.Model;
-using DAL.Repository;
+﻿namespace BLL.Service.impl;
 
-namespace BLL.Service.impl;
+using DAL.Model;
+using DAL.Repository;
 
 public class ImageService : IImageService
 {
@@ -9,17 +9,17 @@ public class ImageService : IImageService
 
     public ImageService(IEntityRepository<Image> imageRepository)
     {
-        _imageRepository = imageRepository;
+        this._imageRepository = imageRepository;
     }
 
     public List<Image> FindAll()
     {
-        return _imageRepository.FindAll().ToList();
+        return this._imageRepository.FindAll().ToList();
     }
 
     public Image? FindById(int id)
     {
-        return _imageRepository.FindById(id);
+        return this._imageRepository.FindById(id);
     }
 
     public void Add(string path, int petId)
@@ -27,14 +27,14 @@ public class ImageService : IImageService
         var image = new Image()
         {
             Path = path,
-            PetId = petId
+            PetId = petId,
         };
 
-        _imageRepository.Add(image);
+        this._imageRepository.Add(image);
     }
 
     public void Remove(int id)
     {
-        _imageRepository.Remove(id);
+        this._imageRepository.Remove(id);
     }
 }

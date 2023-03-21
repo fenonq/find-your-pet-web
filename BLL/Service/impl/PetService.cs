@@ -1,7 +1,7 @@
-﻿using DAL.Model;
-using DAL.Repository;
+﻿namespace BLL.Service.impl;
 
-namespace BLL.Service.impl;
+using DAL.Model;
+using DAL.Repository;
 
 public class PetService : IPetService
 {
@@ -9,7 +9,7 @@ public class PetService : IPetService
 
     public PetService(IEntityRepository<Pet> petRepository)
     {
-        _petRepository = petRepository;
+        this._petRepository = petRepository;
     }
 
     public void Add(string name, int age, string description, int ownerId)
@@ -19,24 +19,24 @@ public class PetService : IPetService
             Name = name,
             Age = age,
             Description = description,
-            OwnerId = ownerId
+            OwnerId = ownerId,
         };
 
-        _petRepository.Add(pet);
+        this._petRepository.Add(pet);
     }
 
     public List<Pet> FindAll()
     {
-        return _petRepository.FindAll().ToList();
+        return this._petRepository.FindAll().ToList();
     }
 
     public Pet? FindById(int id)
     {
-        return _petRepository.FindById(id);
+        return this._petRepository.FindById(id);
     }
 
     public void Remove(int id)
     {
-        _petRepository.Remove(id);
+        this._petRepository.Remove(id);
     }
 }
