@@ -3,43 +3,43 @@
 using DataContext;
 using Model;
 
-public class PetRepository : IEntityRepository<Pet>
+public class PetRepository : IPetRepository
 {
     private readonly FindYourPetContext _context;
 
     public PetRepository(FindYourPetContext context)
     {
-        this._context = context;
+        _context = context;
     }
 
     public IQueryable<Pet> FindAll()
     {
-        return this._context.Pets;
+        return _context.Pets;
     }
 
     public Pet? FindById(int id)
     {
-        return this._context.Pets.Find(id);
+        return _context.Pets.Find(id);
     }
 
     public void Add(Pet pet)
     {
-        this._context.Pets.Add(pet);
-        this._context.SaveChanges();
+        _context.Pets.Add(pet);
+        _context.SaveChanges();
     }
 
     public void Update(Pet pet)
     {
-        this._context.Pets.Update(pet);
-        this._context.SaveChanges();
+        _context.Pets.Update(pet);
+        _context.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var pet = this._context.Pets.Find(id);
+        var pet = _context.Pets.Find(id);
 
         if (pet == null) return;
-        this._context.Pets.Remove(pet);
-        this._context.SaveChanges();
+        _context.Pets.Remove(pet);
+        _context.SaveChanges();
     }
 }

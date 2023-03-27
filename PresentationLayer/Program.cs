@@ -5,6 +5,7 @@ using DAL.Model;
 using DAL.Repository;
 using DAL.Repository.impl;
 using Microsoft.EntityFrameworkCore;
+using PresentationLayer.Mappings;
 using Serilog;
 using Serilog.Formatting.Compact;
 
@@ -12,15 +13,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IPetRepository, PetRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddScoped<IEntityRepository<Image>, ImageRepository>();
-builder.Services.AddScoped<IEntityRepository<Pet>, PetRepository>();
-builder.Services.AddScoped<IEntityRepository<Post>, PostRepository>();
-builder.Services.AddScoped<IEntityRepository<User>, UserRepository>();
+builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 connectionString = connectionString!.Replace("DbPassword", builder.Configuration["DbPassword"]);
@@ -30,10 +33,6 @@ builder.Services.AddDbContext<FindYourPetContext>(options =>
 
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-
-    // .WriteTo.Console(new CompactJsonFormatter())
-    .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);

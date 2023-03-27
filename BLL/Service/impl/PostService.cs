@@ -1,74 +1,60 @@
 ﻿namespace BLL.Service.impl;
 
 using DAL.Model;
-using DAL.Model.Enum;
 using DAL.Repository;
 
 public class PostService : IPostService
 {
-    private readonly IEntityRepository<Post> _postRepository;
+    private readonly IPostRepository _postRepository;
 
-    public PostService(IEntityRepository<Post> postRepository)
+    public PostService(IPostRepository postRepository)
     {
-        this._postRepository = postRepository;
+        _postRepository = postRepository;
     }
 
-    public void Add(
-        DateTime lostDate,
-        string location,
-        string contactNumber,
-        PostType type,
-        DateTime createdAt,
-        bool isActive,
-        int petId,
-        int userId)
+    public int Add(Post post)
     {
-        var post = new Post()
-        {
-            LostDate = lostDate,
-            Location = location,
-            ContactNumber = contactNumber,
-            Type = type,
-            CreatedAt = createdAt,
-            IsActive = isActive,
-            PetId = petId,
-            UserId = userId,
-        };
-
-        this._postRepository.Add(post);
+        post.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+        post.IsActive = true;
+        _postRepository.Add(post);
+        return post.Id;
     }
 
     public void ChangeVisibility(int postId)
     {
-        var post = this._postRepository.FindById(postId);
+        var post = _postRepository.FindById(postId);
 
-        if (post == null) return;
+        if (post == null)
+        {
+            return;
+        }
+
         post.IsActive = !post.IsActive;
-        this._postRepository.Update(post);
+        _postRepository.Update(post);
     }
 
     public List<Post> FindAll()
     {
-        return this._postRepository.FindAll().ToList();
+        return _postRepository.FindAll().ToList();
     }
 
     public List<Post> FindAllByUserId(int userId)
     {
-        return this._postRepository.FindAll().Where(p => p.UserId == userId).ToList();
+        return _postRepository.FindAll().Where(p => p.UserId == userId).ToList();
     }
 
     public List<Post> FindAllByPostType(int postType)
     {
-        return this._postRepository.FindAll().Where(p => (int)p.Type == postType).ToList();
+        return _postRepository.FindAll().Where(p => (int)p.Type == postType).ToList();
     }
 
     public Post? FindById(int id)
     {
-        return this._postRepository.FindById(id);
+        return _postRepository.FindById(id);
     }
 
     public void Remove(int id)
     {
-        this._postRepository.Remove(id);
+        _postRepository.Remove(id);
     }
 }

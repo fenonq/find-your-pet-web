@@ -3,5 +3,5 @@
 public enum PostType
 {
     Found = 0,
-    Lost = 1
+    Lost = 1,
 }

@@ -1,0 +1,54 @@
+﻿@using DAL.Model.Enum
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<PetPostViewModel>
+
+<h2>Pet Posts</h2>
+
+<form>
+    <p>Sort by:</p>
+    <div>
+        <select id="sortOrder" name="sortOrder" asp-route-sortOrder="@ViewData["CurrentSortOrder"]"
+                onchange="this.form.submit()">
+            <option></option>
+            <option value="lost_date">LostDate</option>
+            <option value="location">Location</option>
+            <option value="type">Type</option>
+        </select>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Photo</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Description</th>
+        <th>Lost Date</th>
+        <th>Location</th>
+        <th>Contact Number</th>
+        <th>Post Type</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var petPost in Model)
+    {
+        <tr>
+            <td><img src="@petPost.Image.Path" alt="Pet Photo"></td>
+            <td>@petPost.Pet.Name</td>
+            <td>@petPost.Pet.Age</td>
+            <td>@petPost.Pet.Description</td>
+            <td>@petPost.Post.Date.ToShortDateString()</td>
+            <td>@petPost.Post.Location</td>
+            <td>@petPost.Post.ContactNumber</td>
+            <td>@(petPost.Post.Type == PostType.Found ? "Found" : "Lost")</td>
+            <td>
+                <form asp-controller="Post" asp-action="Delete" asp-route-id="@petPost.Post.Id" method="post">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

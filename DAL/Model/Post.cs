@@ -1,12 +1,12 @@
 ﻿namespace DAL.Model;
 
-using DAL.Model.Enum;
+using Enum;
 
 public class Post
 {
     public int Id { get; set; }
 
-    public DateTime LostDate { get; set; }
+    public DateOnly Date { get; set; }
 
     public string Location { get; set; }
 
@@ -14,7 +14,7 @@ public class Post
 
     public PostType Type { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateOnly CreatedAt { get; set; }
 
     public bool IsActive { get; set; }
 

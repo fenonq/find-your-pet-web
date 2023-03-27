@@ -3,43 +3,47 @@
 using DataContext;
 using Model;
 
-public class ImageRepository : IEntityRepository<Image>
+public class ImageRepository : IImageRepository
 {
     private readonly FindYourPetContext _context;
 
     public ImageRepository(FindYourPetContext context)
     {
-        this._context = context;
+        _context = context;
     }
 
     public IQueryable<Image> FindAll()
     {
-        return this._context.Images;
+        return _context.Images;
     }
 
     public Image? FindById(int id)
     {
-        return this._context.Images.Find(id);
+        return _context.Images.Find(id);
     }
 
     public void Add(Image image)
     {
-        this._context.Images.Add(image);
-        this._context.SaveChanges();
+        _context.Images.Add(image);
+        _context.SaveChanges();
     }
 
     public void Update(Image image)
     {
-        this._context.Images.Update(image);
-        this._context.SaveChanges();
+        _context.Images.Update(image);
+        _context.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var image = this._context.Images.Find(id);
+        var image = _context.Images.Find(id);
 
-        if (image == null) return;
-        this._context.Images.Remove(image);
-        this._context.SaveChanges();
+        if (image == null)
+        {
+            return;
+        }
+
+        _context.Images.Remove(image);
+        _context.SaveChanges();
     }
 }

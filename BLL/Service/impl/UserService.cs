@@ -5,9 +5,9 @@ using DAL.Repository;
 
 public class UserService : IUserService
 {
-    private readonly IEntityRepository<User> _userRepository;
+    private readonly IUserRepository _userRepository;
 
-    public UserService(IEntityRepository<User> userRepository)
+    public UserService(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
@@ -22,16 +22,10 @@ public class UserService : IUserService
         return _userRepository.FindById(id);
     }
 
-    public void RegisterUser(string name, string surname, string login, string password)
+    public int Add(User user)
     {
-        var user = new User
-        {
-            Name = name,
-            Surname = surname,
-            Login = login,
-            Password = password
-        };
         _userRepository.Add(user);
+        return user.Id;
     }
 
     public bool LoginUser(string login, string password)

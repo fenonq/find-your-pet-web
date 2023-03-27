@@ -1,4 +1,6 @@
-﻿namespace PresentationLayer.Controllers;
+﻿using DAL.Model;
+
+namespace PresentationLayer.Controllers;
 
 using System.Diagnostics;
 using BLL.Service;
@@ -12,15 +14,21 @@ public class HomeController : Controller
 
     public HomeController(ILogger<HomeController> logger, IUserService userService)
     {
-        this._logger = logger;
-        this._userService = userService;
+        _logger = logger;
+        _userService = userService;
     }
 
     public IActionResult Index()
     {
-        this._logger.LogInformation("Test information..");
-        this._userService.RegisterUser("Taras", "Fenyk", "Taras", "1234");
-        this.ViewBag.User = this._userService.FindAll()[0].Name;
+        _logger.LogInformation("Test information..");
+        _userService.Add(new User
+        {
+            Name = "test",
+            Surname = "test",
+            Login = "test",
+            Password = "test",
+        });
+        ViewBag.User = _userService.FindAll()[0].Name;
         return View();
     }
 

@@ -204,7 +204,7 @@
 		<!-- Accessible fields should begin with upper-case letter -->
 		<Rule Id="SA1308"  Action="Warning" />
 		<!-- Variable names should not be prefixed -->
-		<Rule Id="SA1309"  Action="Warning" />
+		<Rule Id="SA1309"  Action="None" />
 		<!-- Field names should not begin with underscore -->
 		<Rule Id="SA1310"  Action="Warning" />
 		<!-- Field names should not contain underscore -->
@@ -367,7 +367,7 @@
 		<!-- Documentation should meet character percentage -->
 		<Rule Id="SA1632"  Action="None" />
 		<!-- Documentation text should meet minimum character length -->
-		<Rule Id="SA1633"  Action="Warning" />
+		<Rule Id="SA1633"  Action="None" />
 		<!-- File should have header -->
 		<Rule Id="SA1634"  Action="Warning" />
 		<!-- File header should show copyright -->

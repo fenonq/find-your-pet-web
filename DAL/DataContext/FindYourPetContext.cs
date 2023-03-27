@@ -1,6 +1,6 @@
 ﻿namespace DAL.DataContext;
 
-using DAL.Model;
+using Model;
 using Microsoft.EntityFrameworkCore;
 
 public class FindYourPetContext : DbContext
@@ -100,7 +100,7 @@ public class FindYourPetContext : DbContext
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
 
-            entity.Property(e => e.LostDate)
+            entity.Property(e => e.Date)
                 .IsRequired()
                 .HasColumnName("lost_date");
 

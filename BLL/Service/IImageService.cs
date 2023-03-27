@@ -2,13 +2,6 @@
 
 using DAL.Model;
 
-public interface IImageService
+public interface IImageService : ICrudService<Image>
 {
-    List<Image> FindAll();
-
-    Image? FindById(int id);
-
-    void Add(string path, int petId);
-
-    void Remove(int id);
 }

@@ -5,36 +5,31 @@ using DAL.Repository;
 
 public class ImageService : IImageService
 {
-    private readonly IEntityRepository<Image> _imageRepository;
+    private readonly IImageRepository _imageRepository;
 
-    public ImageService(IEntityRepository<Image> imageRepository)
+    public ImageService(IImageRepository imageRepository)
     {
-        this._imageRepository = imageRepository;
+        _imageRepository = imageRepository;
     }
 
     public List<Image> FindAll()
     {
-        return this._imageRepository.FindAll().ToList();
+        return _imageRepository.FindAll().ToList();
     }
 
     public Image? FindById(int id)
     {
-        return this._imageRepository.FindById(id);
+        return _imageRepository.FindById(id);
     }
 
-    public void Add(string path, int petId)
+    public int Add(Image image)
     {
-        var image = new Image()
-        {
-            Path = path,
-            PetId = petId,
-        };
-
-        this._imageRepository.Add(image);
+        _imageRepository.Add(image);
+        return image.Id;
     }
 
     public void Remove(int id)
     {
-        this._imageRepository.Remove(id);
+        _imageRepository.Remove(id);
     }
 }

@@ -5,38 +5,32 @@ using DAL.Repository;
 
 public class PetService : IPetService
 {
-    private readonly IEntityRepository<Pet> _petRepository;
+    private readonly IPetRepository _petRepository;
 
-    public PetService(IEntityRepository<Pet> petRepository)
+    public PetService(IPetRepository petRepository)
     {
-        this._petRepository = petRepository;
+        _petRepository = petRepository;
     }
 
-    public void Add(string name, int age, string description, int ownerId)
+    public int Add(Pet pet)
     {
-        var pet = new Pet
-        {
-            Name = name,
-            Age = age,
-            Description = description,
-            OwnerId = ownerId,
-        };
-
-        this._petRepository.Add(pet);
+        pet.Name = string.IsNullOrEmpty(pet.Name) ? "-" : pet.Name;
+        _petRepository.Add(pet);
+        return pet.Id;
     }
 
     public List<Pet> FindAll()
     {
-        return this._petRepository.FindAll().ToList();
+        return _petRepository.FindAll().ToList();
     }
 
     public Pet? FindById(int id)
     {
-        return this._petRepository.FindById(id);
+        return _petRepository.FindById(id);
     }
 
     public void Remove(int id)
     {
-        this._petRepository.Remove(id);
+        _petRepository.Remove(id);
     }
 }
