@@ -22,6 +22,11 @@ public class ImageService : IImageService
         return _imageRepository.FindById(id);
     }
 
+    public Image FindByPetId(int petId)
+    {
+        return _imageRepository.FindAll().Where(p => p.PetId == petId).FirstOrDefault();
+    }
+
     public int Add(Image image)
     {
         _imageRepository.Add(image);

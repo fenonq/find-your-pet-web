@@ -1,0 +1,49 @@
+﻿@model PetPostViewModel
+
+<div class="post-wrapper">
+    <div class="post-content">
+        @*<div class="pet-info">*@
+        <img src="@(string.IsNullOrEmpty(Model.Image.Path) ? "../images/pet-default.jpg" : Model.Image.Path)" alt="Pet Photo">
+            
+        @*</div>*@
+        <div class="post-info">
+
+            <div class="info-row">
+                <p>Pet name</p>
+                <p>@Model.Pet.Name</p>
+            </div>
+
+            <div class="info-row">
+                <p>Pet age</p>
+                <p>@Model.Pet.Age</p>
+            </div>
+
+            <div class="info-row">
+                <p>Description</p>
+                <p>@Model.Pet.Description</p>
+            </div>
+
+            <div class="info-row">
+                <p>Location</p>
+                <p>@Model.Post.Date.ToShortDateString()</p>
+            </div>
+
+            <div class="info-row">
+                <p>Location</p>
+                <p>@Model.Post.Location</p>
+            </div>
+        </div>
+        <div tabindex="0" class="contact-button">
+            <div>
+                <span class="button-front">
+                    Contact owner
+                </span>
+                <span class="button-back">
+                    @Model.Post.ContactNumber
+                </span>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
