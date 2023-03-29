@@ -1,4 +1,7 @@
-﻿namespace DAL.Model;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DAL.Model;
 
 public class User
 {
@@ -11,6 +14,12 @@ public class User
     public string Login { get; set; }
 
     public string Password { get; set; }
+
+    [NotMapped]
+    public IFormFile Photo { get; set; }
+
+    [NotMapped]
+    public string PhotoPath { get; set; }
 
     public virtual IEnumerable<Pet> Pets { get; } = new List<Pet>();
 

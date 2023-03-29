@@ -31,7 +31,7 @@ public class HomeController : Controller
         ViewBag.User = _userService.FindAll()[0].Name;
         return View();
     }
-
+     
     public IActionResult Privacy()
     {
         return View();

@@ -1,0 +1,28 @@
+﻿@model DAL.Model.User
+
+@{
+    ViewData["Title"] = "Upload";
+
+}
+<form asp-action="UploadUserPhoto" asp-controller="Account" method="post" enctype="multipart/form-data">
+    <div class="row mt-2">
+        <div class="col-12">
+            <label class="col-form-label">Enter File Name For Save</label>
+            <input type="FileName" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-12">
+            <label class="col-form-label">Select File</label>
+            <input type="file" class="form-control" />
+        </div>
+    </div>
+
+
+    <div class="row mt-2">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Upload File</button>
+        </div>
+    </div>
+</form>
