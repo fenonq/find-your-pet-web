@@ -1,0 +1,39 @@
+﻿
+
+.user-friendly-error-wrapper {
+    height: 100%;
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.server-error-background {
+    background-image: url(/images/error-page.webp);
+    height: 410px;
+    width: 400px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.error-state {
+    position: relative;
+}
+
+.user-friendly-error-wrapper p {
+    margin-top: 1rem;
+    color: #616161;
+    text-align: center;
+}
+
+.error-state h3 {
+    position: absolute;
+    color: var(--component-active-color);
+    bottom: -25px;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+}

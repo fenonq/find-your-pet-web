@@ -2,8 +2,22 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <p>@ViewBag.User</p>
+<div class="main-content">
+    <div class="main-info">
+        <p>This website was created for people<br/> 
+            who has lost or found a pet.<br />
+            Lets help animals to find their homes! 
+        </p>
+        <div class="w-100">
+            <form asp-action="AllPosts" asp-controller="Post" method="get">
+                <button class="btn button" type="submit">View all posts</button>
+            </form>
+            <form asp-action="CreatePost" asp-controller="Post" asp-area="" method="get">
+                <button class="btn button" type="submit">Create a post</button>
+            </form>
+        </div>
+            
+    </div>
+    <div class="main-image"></div>
+    
 </div>

@@ -1,0 +1,18 @@
+﻿:root {
+    --layout-background: #F1F3F8;
+    --component-primary-background-color: #FFFFFF;
+    --component-secondary-background-color: #DADADA;
+    --component-border-radius: 10px;
+    --component-border: 1px solid;
+    --component-border-color: rgba(0, 0, 0, 0);
+    --button-primary-color: rgba(216, 238, 241, 1);
+    /* animation*/
+    --defualt-animation: all 0.15s ease-in-out;
+    --tab-animation: all 0.15s ease-in-out;
+    /* fonts */
+    --font-primary-color: rgba(0, 0, 0, 1);
+    --font-primary-weight: 500;
+    --font-primary-size: 16px;
+    --font-secondary-color: rgba(0, 0, 0, 0.5);
+    --font-active-button-color: #FFFFFF;
+}

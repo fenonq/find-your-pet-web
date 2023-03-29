@@ -1,3 +1,9 @@
+@import "components/user-friendly-error.css";
+@import "components/post.css";
+@import "shared/buttons.css";
+@import "shared/default.css";
+@import "components/index.css";
+
 html {
   font-size: 14px;
 }
@@ -18,5 +24,11 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: var(--layout-background);
+}
+body > .container main{
+    padding: 1rem 4rem;
+}
+body > .container {
 }

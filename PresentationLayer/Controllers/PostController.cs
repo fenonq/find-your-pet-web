@@ -103,6 +103,32 @@ public class PostController : Controller
         return View(petPosts);
     }
 
+    [HttpGet]
+    public IActionResult PostDetails(int id)
+    {
+        try
+        {
+            _logger.LogInformation("Show PostDetails..");
+
+            var post = _postService.FindById(id);
+            var pet = _petService.FindById(post.PetId);
+            var image = _imageService.FindByPetId(post.PetId);
+
+            var postExtensionModel = new PetPostViewModel
+            {
+                Post = _mapper.Map<PostViewModel>(post),
+                Pet = _mapper.Map<PetViewModel>(pet),
+                Image = _mapper.Map<ImageViewModel>(image),
+            };
+            return View(postExtensionModel);
+        }
+        catch (Exception)
+        {
+            return View("Error");
+            throw;
+        }
+    }
+
     [HttpPost]
     public IActionResult Delete(int id)
     {
