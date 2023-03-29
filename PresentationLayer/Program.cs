@@ -26,7 +26,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-connectionString = connectionString!.Replace("1", builder.Configuration["1"]);
+connectionString = connectionString!.Replace("DbPassword", builder.Configuration["DbPassword"]);
 
 builder.Services.AddDbContext<FindYourPetContext>(options =>
     options.UseNpgsql(connectionString));
