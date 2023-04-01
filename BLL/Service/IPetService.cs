@@ -1,6 +1,6 @@
-﻿namespace BLL.Service;
+﻿using DAL.Model;
 
-using DAL.Model;
+namespace BLL.Service;
 
 public interface IPetService : ICrudService<Pet>
 {

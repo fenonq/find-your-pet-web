@@ -3,25 +3,25 @@
     ViewData["Title"] = "Account";
 }
 
-    <h1>Personal Account</h1>
-        <div class="container">
-            <div class="id">
-                <label>Id:</label>
-                <label>@Model.Id</label>
-            </div>
-            <div class="name">
-                <label>Name:</label>
-                <label>@Model.Name</label>
-            </div>
-            <div class="surname">
-                <label>Surname:</label>
-                <label>@Model.Surname</label>
-            </div>
-            <div class="login">
-                <label>Login:</label>
-                <label>@Model.Login</label>
-            </div>
-        </div>
+<h1>Personal Account</h1>
+<div class="container">
+    <div class="id">
+        <label>Id:</label>
+        <label>@Model.Id</label>
+    </div>
+    <div class="name">
+        <label>Name:</label>
+        <label>@Model.Name</label>
+    </div>
+    <div class="surname">
+        <label>Surname:</label>
+        <label>@Model.Surname</label>
+    </div>
+    <div class="login">
+        <label>Login:</label>
+        <label>@Model.Login</label>
+    </div>
+</div>
 <div class="photo">
     <img src="@Model.PhotoPath" alt="Photo">
 </div>
@@ -29,7 +29,7 @@
     <div class="row mt-2">
         <div class="col-12">
             <label class="col-form-label">Select File</label>
-            <input asp-for=@Model.Photo class="form-control" />
+            <input asp-for=@Model.Photo class="form-control"/>
         </div>
     </div>
 

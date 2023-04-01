@@ -1,7 +1,7 @@
-﻿namespace BLL.Service.impl;
-
-using DAL.Model;
+﻿using DAL.Model;
 using DAL.Repository;
+
+namespace BLL.Service.impl;
 
 public class PetService : IPetService
 {

@@ -8,27 +8,21 @@ namespace PresentationLayer.Controllers;
 
 public class PostController : Controller
 {
-    private readonly ILogger<AccountController> _logger;
-    private readonly IPostService _postService;
-    private readonly IPetService _petService;
-    private readonly IImageService _imageService;
     private readonly IMapper _mapper;
-    private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IPostService _postService;
+    private readonly ILogger<AccountController> _logger;
+    private readonly IPetPostImageService _petPostImageService;
 
     public PostController(
-        ILogger<AccountController> logger,
-        IPostService postService,
         IMapper mapper,
-        IPetService petService,
-        IWebHostEnvironment webHostEnvironment,
-        IImageService imageService)
+        IPostService postService,
+        ILogger<AccountController> logger,
+        IPetPostImageService petPostImageService)
     {
         _logger = logger;
-        _postService = postService;
         _mapper = mapper;
-        _petService = petService;
-        _webHostEnvironment = webHostEnvironment;
-        _imageService = imageService;
+        _postService = postService;
+        _petPostImageService = petPostImageService;
     }
 
     [HttpGet]
@@ -39,35 +33,12 @@ public class PostController : Controller
     }
 
     [HttpPost]
-    public IActionResult CreatePost(PetPostViewModel model)
+    public IActionResult CreatePost(PetPostImageViewModel model)
     {
         _logger.LogInformation("Creating post..");
         var pet = _mapper.Map<Pet>(model.Pet);
-
-        pet.OwnerId = 1;
-        _petService.Add(pet);
-
         var post = _mapper.Map<Post>(model.Post);
-        post.PetId = pet.Id;
-        post.UserId = 1;
-
-        if (model.Post.Photo.Length > 0)
-        {
-            var fileName = Guid.NewGuid() + Path.GetExtension(model.Post.Photo.FileName);
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", fileName);
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                model.Post.Photo.CopyTo(stream);
-            }
-
-            _imageService.Add(new Image
-            {
-                Path = "/uploads/" + fileName,
-                PetId = pet.Id,
-            });
-        }
-
-        _postService.Add(post);
+        _petPostImageService.AddPetPostImage(post, pet, model.Post.Photo);
         _logger.LogInformation("Post successfully created");
         return RedirectToAction("Index", "Home");
     }
@@ -76,56 +47,24 @@ public class PostController : Controller
     public IActionResult AllPosts(string sortOrder)
     {
         _logger.LogInformation("Show AllPosts..");
-        ViewBag.DateSortParm = string.IsNullOrEmpty(sortOrder) ? "date" : string.Empty;
-
-        var findAllPosts = _postService.FindAll().Where(p => p.IsActive);
-        var findAllPets = _petService.FindAll();
-        var findAllImages = _imageService.FindAll();
-
-        var postsWithPets = from post in findAllPosts
-            join pet in findAllPets on post.PetId equals pet.Id
-            join image in findAllImages on pet.Id equals image.PetId
-            select new PetPostViewModel
-            {
-                Post = _mapper.Map<PostViewModel>(post),
-                Pet = _mapper.Map<PetViewModel>(pet),
-                Image = _mapper.Map<ImageViewModel>(image),
-            };
-
-        IEnumerable<PetPostViewModel> petPosts = sortOrder switch
-        {
-            "lost_date" => postsWithPets.OrderByDescending(pp => pp.Post.Date),
-            "location" => postsWithPets.OrderByDescending(pp => pp.Post.Location),
-            "type" => postsWithPets.OrderByDescending(pp => pp.Post.Type),
-            _ => postsWithPets.OrderBy(pp => pp.Post.Date)
-        };
-
+        var petPosts = _mapper.Map<IEnumerable<PetPostImageViewModel>>(_petPostImageService
+            .FindAllPetPostImage(sortOrder));
         return View(petPosts);
     }
 
     [HttpGet]
     public IActionResult PostDetails(int id)
     {
+        _logger.LogInformation("Show PostDetails..");
         try
         {
-            _logger.LogInformation("Show PostDetails..");
-
-            var post = _postService.FindById(id);
-            var pet = _petService.FindById(post.PetId);
-            var image = _imageService.FindByPetId(post.PetId);
-
-            var postExtensionModel = new PetPostViewModel
-            {
-                Post = _mapper.Map<PostViewModel>(post),
-                Pet = _mapper.Map<PetViewModel>(pet),
-                Image = _mapper.Map<ImageViewModel>(image),
-            };
+            var postExtensionModel =
+                _mapper.Map<PetPostImageViewModel>(_petPostImageService.FindByPostId(id));
             return View(postExtensionModel);
         }
         catch (Exception)
         {
             return View("Error");
-            throw;
         }
     }
 

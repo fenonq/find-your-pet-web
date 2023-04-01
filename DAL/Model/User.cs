@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace DAL.Model;
 
@@ -15,11 +15,9 @@ public class User
 
     public string Password { get; set; }
 
-    [NotMapped]
-    public IFormFile Photo { get; set; }
+    [NotMapped] public IFormFile Photo { get; set; }
 
-    [NotMapped]
-    public string PhotoPath { get; set; }
+    [NotMapped] public string PhotoPath { get; set; }
 
     public virtual IEnumerable<Pet> Pets { get; } = new List<Pet>();
 

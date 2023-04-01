@@ -1,10 +1,10 @@
-﻿@model PetPostViewModel
+﻿@model PetPostImageViewModel
 
 <div class="post-wrapper">
     <div class="post-content">
         @*<div class="pet-info">*@
         <img src="@(string.IsNullOrEmpty(Model.Image.Path) ? "../images/pet-default.jpg" : Model.Image.Path)" alt="Pet Photo">
-            
+
         @*</div>*@
         <div class="post-info">
 
@@ -50,4 +50,3 @@
         </div>
     </div>
 </div>
-

@@ -1,13 +1,11 @@
 using BLL.Service;
 using BLL.Service.impl;
 using DAL.DataContext;
-using DAL.Model;
 using DAL.Repository;
 using DAL.Repository.impl;
 using Microsoft.EntityFrameworkCore;
 using PresentationLayer.Mappings;
 using Serilog;
-using Serilog.Formatting.Compact;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +20,7 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPetPostImageService, PetPostImageService>();
 
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 

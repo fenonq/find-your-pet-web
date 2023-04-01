@@ -1,7 +1,7 @@
-﻿namespace DAL.DataContext;
-
-using Model;
+﻿using DAL.Model;
 using Microsoft.EntityFrameworkCore;
+
+namespace DAL.DataContext;
 
 public class FindYourPetContext : DbContext
 {

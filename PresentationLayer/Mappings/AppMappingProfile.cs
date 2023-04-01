@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BLL.Dto;
 using DAL.Model;
 using PresentationLayer.Models;
 
@@ -12,5 +13,6 @@ public class AppMappingProfile : Profile
         CreateMap<PostViewModel, Post>().ReverseMap();
         CreateMap<PetViewModel, Pet>().ReverseMap();
         CreateMap<ImageViewModel, Image>().ReverseMap();
+        CreateMap<PetPostImageViewModel, PetPostImageDto>().ReverseMap();
     }
 }

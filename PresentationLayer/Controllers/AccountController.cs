@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BLL.Service;
-using BLL.Service.impl;
 using DAL.Model;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
@@ -51,38 +50,40 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult UserProfile()
     {
-        var current_user = _userService.FindById(2);
-        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", current_user.Id.ToString() + ".jpg");
+        var currentUser = _userService.FindById(2);
+        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", currentUser.Id + ".jpg");
         if (System.IO.File.Exists(path))
         {
-            current_user.PhotoPath = "/userPhotos/" + current_user.Id.ToString() + ".jpg";
+            currentUser.PhotoPath = "/userPhotos/" + currentUser.Id + ".jpg";
         }
         else
         {
-            current_user.PhotoPath = "/userPhotos/" + "default.png";
+            currentUser.PhotoPath = "/userPhotos/" + "default.png";
         }
 
         _logger.LogInformation("Show account..");
-        return View(current_user);
+        return View(currentUser);
     }
 
     [HttpPost]
     public IActionResult UploadUserPhoto(User model)
     {
-        var current_user = _userService.FindById(2);
+        var currentUser = _userService.FindById(2);
 
-        if (model.Photo.Length > 0)
+        if (model.Photo.Length <= 0)
         {
-            var fileName = current_user.Id + Path.GetExtension(model.Photo.FileName);
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", fileName);
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                model.Photo.CopyTo(stream);
-            }
-
-            current_user.PhotoPath = "/userPhotos/" + fileName;
+            return View("UserProfile", currentUser);
         }
 
-        return View("UserProfile", current_user);
+        var fileName = currentUser.Id + Path.GetExtension(model.Photo.FileName);
+        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", fileName);
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            model.Photo.CopyTo(stream);
+        }
+
+        currentUser.PhotoPath = "/userPhotos/" + fileName;
+
+        return View("UserProfile", currentUser);
     }
 }

@@ -1,11 +1,10 @@
-﻿using DAL.Model;
+﻿using System.Diagnostics;
+using BLL.Service;
+using DAL.Model;
+using Microsoft.AspNetCore.Mvc;
+using PresentationLayer.Models;
 
 namespace PresentationLayer.Controllers;
-
-using System.Diagnostics;
-using BLL.Service;
-using Microsoft.AspNetCore.Mvc;
-using Models;
 
 public class HomeController : Controller
 {
@@ -31,7 +30,7 @@ public class HomeController : Controller
         ViewBag.User = _userService.FindAll()[0].Name;
         return View();
     }
-     
+
     public IActionResult Privacy()
     {
         return View();
