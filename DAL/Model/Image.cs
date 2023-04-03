@@ -9,9 +9,4 @@ public class Image
     public int PetId { get; set; }
 
     public virtual Pet Pet { get; set; }
-    
-    public override string ToString()
-    {
-        return $"Image(Id={Id}, Path={Path}, PetId={PetId})";
-    }
 }

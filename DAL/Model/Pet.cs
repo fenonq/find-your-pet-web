@@ -17,9 +17,4 @@ public class Pet
     public virtual Image Image { get; set; }
 
     public virtual ICollection<Post> Posts { get; } = new List<Post>();
-    
-    public override string ToString()
-    {
-        return $"Pet(Id: {Id}, Name: {Name}, Age: {Age}, Description: {Description}, OwnerId: {OwnerId})";
-    }
 }

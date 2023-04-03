@@ -25,9 +25,4 @@ public class Post
     public Pet Pet { get; set; }
 
     public virtual User User { get; set; }
-    
-    public override string ToString()
-    {
-        return $"Post(Id: {Id}, Date: {Date}, Location: {Location}, ContactNumber: {ContactNumber}, Type: {Type}, CreatedAt: {CreatedAt}, IsActive: {IsActive}, PetId: {PetId}, UserId: {UserId})";
-    }
 }
