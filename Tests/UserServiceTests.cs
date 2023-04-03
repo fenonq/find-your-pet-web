@@ -1,147 +1,103 @@
 using BLL.Service.impl;
-using DAL.DataContext;
 using DAL.Model;
-using DAL.Repository.impl;
-using EntityFrameworkCoreMock;
+using DAL.Repository;
+using Moq;
 
-namespace Tests
+namespace Tests;
+
+public class UserServiceTests
 {
-    public class UserServiceTests
+    private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly UserService _userService;
+
+    public UserServiceTests()
     {
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _userService = new UserService(_userRepositoryMock.Object);
+    }
 
-        UserService createUserService()
-        {
-            var dbContextMock = new DbContextMock<FindYourPetContext>();
-            dbContextMock.CreateDbSetMock(x => x.Users, new List<User>());
-            UserRepository repository = new UserRepository(dbContextMock.Object);
-            return new UserService(repository);
-        }
+    [Fact]
+    public void FindAll_ReturnsListOfUsers()
+    {
+        var users = new List<User> { new(), new() };
+        _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(users.AsQueryable());
 
-        [Fact]
-        public void Add_AddSingleUser_UserServiceShouldContainOnlyOneUser()
-        {
-            var userService = createUserService();
+        var result = _userService.FindAll();
 
-            User user1 = new User();
-            user1.Name = "Test User";
-            user1.Id = 0;
+        Assert.Equal(users, result);
+    }
 
-            userService.Add(user1);
+    [Fact]
+    public void FindById_ReturnsUserById()
+    {
+        var user = new User { Id = 1 };
+        _userRepositoryMock.Setup(repo => repo.FindById(1)).Returns(user);
 
-            var allUsers = userService.FindAll();
-            Assert.Single(allUsers);
+        var result = _userService.FindById(1);
 
-            var firstUser =  userService.FindById(0);
-            Assert.Equal(firstUser, user1);
-        }
+        Assert.Equal(user, result);
+    }
 
-        [Fact]
-        public void Remove_RemoveUser_UserServiceShouldSuccessfullyRemoveUser()
-        {
-            var userService = createUserService();
+    [Fact]
+    public void Add_CallsUserRepositoryAddMethod()
+    {
+        var user = new User { Name = "John", Login = "johndoe", Password = "password" };
 
-            User user1 = new User();
-            user1.Name = "Test User1";
-            user1.Id = 0;
+        _userService.Add(user);
 
-            User user2 = new User();
-            user2.Name = "Test User2";
-            user2.Id = 1;
+        _userRepositoryMock.Verify(repo => repo.Add(user), Times.Once);
+    }
 
-            userService.Add(user1);
-            userService.Add(user2);
+    [Fact]
+    public void Add_ReturnsUserId()
+    {
+        var user = new User { Name = "John", Login = "johndoe", Password = "password", Id = 1 };
+        _userRepositoryMock.Setup(repo => repo.Add(user));
 
-            userService.Remove(1);
+        var result = _userService.Add(user);
 
-            var allUsers = userService.FindAll();
+        Assert.Equal(user.Id, result);
+    }
 
-            Assert.Single(allUsers);
-            Assert.Equal(allUsers[0], user1);
-        }
+    [Fact]
+    public void LoginUser_ReturnsTrueIfCredentialsAreValid()
+    {
+        var user = new User { Login = "johndoe", Password = "password" };
+        _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(new List<User> { user }.AsQueryable());
 
-        [Fact]
-        public void LoginUser_UserWithCorrectPassword_UserShouldSuccessfullyLogin()
-        {
-            var userService = createUserService();
+        var result = _userService.LoginUser("johndoe", "password");
 
-            var login = "test@gmail.com";
-            var pass = "1111";
+        Assert.True(result);
+    }
 
-            User user1 = new User();
-            user1.Name = "Test User";
-            user1.Id = 0;
-            user1.Login = login;
-            user1.Password = pass;
+    [Fact]
+    public void LoginUser_ReturnsFalseIfUserDoesNotExist()
+    {
+        _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(new List<User>().AsQueryable());
 
-            userService.Add(user1);
+        var result = _userService.LoginUser("johndoe", "password");
 
-            Assert.True(userService.LoginUser(login, pass));
-        }
+        Assert.False(result);
+    }
 
-        [Fact]
-        public void LoginUser_UserWithInCorrectPassword_UserShouldFailedLogin()
-        {
-            var userService = createUserService();
+    [Fact]
+    public void LoginUser_ReturnsFalseIfPasswordIsIncorrect()
+    {
+        var user = new User { Login = "johndoe", Password = "password" };
+        _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(new List<User> { user }.AsQueryable());
 
-            var login = "test@gmail.com";
-            var pass = "1111";
+        var result = _userService.LoginUser("johndoe", "wrongpassword");
 
-            User user1 = new User();
-            user1.Name = "Test User";
-            user1.Id = 0;
-            user1.Login = login;
-            user1.Password = "another_pass";
+        Assert.False(result);
+    }
 
-            userService.Add(user1);
+    [Fact]
+    public void Remove_CallsUserRepositoryRemoveMethod()
+    {
+        const int userId = 1;
 
-            Assert.False(userService.LoginUser(login, pass));
-        }
+        _userService.Remove(userId);
 
-
-        [Fact]
-        public void FindAll_AddSomeUsers_FindAllShouldReturnCorrectResult()
-        {
-            var userService = createUserService();
-
-            var users = new List<User>();
-            //Add ten users
-            foreach(var i in Enumerable.Range(0, 10))
-            {
-                var user = new User();
-                user.Id = i;
-                user.Name = "Test Name";;
-
-                users.Add(user);
-                userService.Add(user);
-            }
-
-            Assert.Equal(users, userService.FindAll());
-        }
-
-        [Fact]
-        public void FindById_AddSomeUsers_FindByIdShouldReturnCorrectResult()
-        {
-            var userService = createUserService();
-
-            var users = new List<User>();
-            //Add ten users
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var user = new User();
-                user.Id = i;
-                user.Name = "Test Name";
-
-                users.Add(user);
-                userService.Add(user);
-            }
-
-            var expectedUser = new User();
-            expectedUser.Id = 11;
-            expectedUser.Name = "Expected User";
-
-            userService.Add(expectedUser);
-
-            Assert.Equal(expectedUser, userService.FindById(11));
-        }
+        _userRepositoryMock.Verify(repo => repo.Remove(userId), Times.Once);
     }
 }

@@ -1,107 +1,81 @@
 ﻿using BLL.Service.impl;
-using DAL.DataContext;
 using DAL.Model;
-using DAL.Repository.impl;
-using EntityFrameworkCoreMock;
+using DAL.Repository;
+using Moq;
 
-namespace Tests
+namespace Tests;
+
+public class PetServiceTests
 {
-    public class PetServiceTests
+    private readonly Mock<IPetRepository> _petRepositoryMock;
+    private readonly PetService _petService;
+
+    public PetServiceTests()
     {
-        PetService createPetService()
-        {
-            var dbContextMock = new DbContextMock<FindYourPetContext>();
-            dbContextMock.CreateDbSetMock(x => x.Pets, new List<Pet>());
-            var repository = new PetRepository(dbContextMock.Object);
-            return new PetService(repository);
-        }
+        _petRepositoryMock = new Mock<IPetRepository>();
+        _petService = new PetService(_petRepositoryMock.Object);
+    }
 
-        [Fact]
-        public void Add_AddPet_PetServiceShouldContainOnlyOnePet()
-        {
-            var petSrvice = createPetService();
+    [Fact]
+    public void Add_CallsPetRepositoryAddMethod()
+    {
+        var pet = new Pet { Name = "Fluffy" };
 
-            Pet pet = new Pet();
-            pet.Name = "Test Pet";
-            pet.Id = 0;
+        _petService.Add(pet);
 
-            petSrvice.Add(pet);
+        _petRepositoryMock.Verify(repo => repo.Add(pet), Times.Once);
+    }
 
-            var allPets = petSrvice.FindAll();
-            Assert.Single(allPets);
+    [Fact]
+    public void Add_ReturnsPetId()
+    {
+        var pet = new Pet { Name = "Fluffy", Id = 1 };
+        _petRepositoryMock.Setup(repo => repo.Add(pet));
 
-            var firstPet = petSrvice.FindById(0);
-            Assert.Equal(firstPet, pet);
-        }
+        var result = _petService.Add(pet);
 
-        [Fact]
-        public void Remove_RemovePet_PetServiceShouldSuccessfullyRemovePet()
-        {
-            var petService = createPetService();
+        Assert.Equal(pet.Id, result);
+    }
 
-            Pet pet1 = new Pet();
-            pet1.Name = "Test Pet1";
-            pet1.Id = 0;
+    [Fact]
+    public void Add_WhenNameIsNull_SetsNameToDash()
+    {
+        var pet = new Pet { Name = null };
 
-            Pet pet2 = new Pet();
-            pet2.Name = "Test Pet2";
-            pet2.Id = 1;
+        _petService.Add(pet);
 
-            petService.Add(pet1);
-            petService.Add(pet2);
+        Assert.Equal("-", pet.Name);
+    }
 
-            petService.Remove(1);
+    [Fact]
+    public void FindAll_ReturnsListOfPets()
+    {
+        var pets = new List<Pet> { new(), new() };
+        _petRepositoryMock.Setup(repo => repo.FindAll()).Returns(pets.AsQueryable());
 
-            var allPets = petService.FindAll();
+        var result = _petService.FindAll();
 
-            Assert.Single(allPets);
-            Assert.Equal(allPets[0], pet1);
-        }
+        Assert.Equal(pets, result);
+    }
 
-        [Fact]
-        public void FindAll_AddSomePets_FindAllShouldReturnCorrectResult()
-        {
-            var petService = createPetService();
+    [Fact]
+    public void FindById_ReturnsPetById()
+    {
+        var pet = new Pet { Id = 1 };
+        _petRepositoryMock.Setup(repo => repo.FindById(1)).Returns(pet);
 
-            var pets = new List<Pet>();
-            //Add ten pets
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var pet = new Pet();
-                pet.Id = i;
-                pet.Name = "Test Name"; ;
+        var result = _petService.FindById(1);
 
-                pets.Add(pet);
-                petService.Add(pet);
-            }
+        Assert.Equal(pet, result);
+    }
 
-            Assert.Equal(pets, petService.FindAll());
-        }
+    [Fact]
+    public void Remove_CallsPetRepositoryRemoveMethod()
+    {
+        const int petId = 1;
 
-        [Fact]
-        public void FindById_AddSomePets_FindByIdShouldReturnCorrectResult()
-        {
-            var petService = createPetService();
+        _petService.Remove(petId);
 
-            var pets = new List<Pet>();
-            //Add ten pets
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var pet = new Pet();
-                pet.Id = i;
-                pet.Name = "Test Name";
-
-                pets.Add(pet);
-                petService.Add(pet);
-            }
-
-            var expectedPet = new Pet();
-            expectedPet.Id = 11;
-            expectedPet.Name = "Expected Pet";
-
-            petService.Add(expectedPet);
-
-            Assert.Equal(expectedPet, petService.FindById(11));
-        }
+        _petRepositoryMock.Verify(repo => repo.Remove(petId), Times.Once);
     }
 }

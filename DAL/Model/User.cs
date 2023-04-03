@@ -15,9 +15,11 @@ public class User
 
     public string Password { get; set; }
 
-    [NotMapped] public IFormFile Photo { get; set; }
+    [NotMapped]
+    public IFormFile Photo { get; set; }
 
-    [NotMapped] public string PhotoPath { get; set; }
+    [NotMapped]
+    public string PhotoPath { get; set; }
 
     public virtual IEnumerable<Pet> Pets { get; } = new List<Pet>();
 

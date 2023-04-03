@@ -34,7 +34,7 @@ public class PetPostImageService : IPetPostImageService
 
         post.PetId = pet.Id;
         post.UserId = 1;
-        _postService.Add(post);
+        var postId = _postService.Add(post);
 
         if (image.Length <= 0)
         {
@@ -54,12 +54,12 @@ public class PetPostImageService : IPetPostImageService
             PetId = pet.Id,
         });
 
-        return post.Id;
+        return postId;
     }
 
     public IEnumerable<PetPostImageDto> FindAllPetPostImage(string sortOrder)
     {
-        var findAllPosts = _postService.FindAll().Where(p => p.IsActive);
+        var findAllPosts = _postService.FindAll().Where(p => p.IsActive).ToList();
         var findAllPets = _petService.FindAll();
         var findAllImages = _imageService.FindAll();
 
@@ -84,7 +84,7 @@ public class PetPostImageService : IPetPostImageService
         return petPosts;
     }
 
-    public PetPostImageDto? FindByPostId(int id)
+    public PetPostImageDto FindByPostId(int id)
     {
         var post = _postService.FindById(id);
         var pet = _petService.FindById(post.PetId);

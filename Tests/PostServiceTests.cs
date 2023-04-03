@@ -1,173 +1,136 @@
 ﻿using BLL.Service.impl;
-using DAL.DataContext;
 using DAL.Model;
 using DAL.Model.Enum;
-using DAL.Repository.impl;
-using EntityFrameworkCoreMock;
+using DAL.Repository;
+using Moq;
 
-namespace Tests
+namespace Tests;
+
+public class PostServiceTests
 {
-    public class PostServiceTests
+    private readonly Mock<IPostRepository> _postRepositoryMock;
+    private readonly PostService _postService;
+
+    public PostServiceTests()
     {
-        PostService createPostService()
-        {
-            var dbContextMock = new DbContextMock<FindYourPetContext>();
-            dbContextMock.CreateDbSetMock(x => x.Posts, new List<Post>());
-            var repository = new PostRepository(dbContextMock.Object);
-            return new PostService(repository);
-        }
+        _postRepositoryMock = new Mock<IPostRepository>();
+        _postService = new PostService(_postRepositoryMock.Object);
+    }
 
-        [Fact]
-        public void Add_AddPost_PostServiceShouldContainOnlyOnePost()
-        {
-            var postSrvice = createPostService();
+    [Fact]
+    public void Add_CallsPostRepositoryAddMethod()
+    {
+        var post = new Post();
 
-            Post post = new Post();
-            post.Id = 0;
+        _postService.Add(post);
 
-            postSrvice.Add(post);
+        _postRepositoryMock.Verify(repo => repo.Add(post), Times.Once);
+    }
 
-            var allPosts = postSrvice.FindAll();
-            Assert.Single(allPosts);
+    [Fact]
+    public void Add_ReturnsPostId()
+    {
+        var post = new Post { Id = 1 };
+        _postRepositoryMock.Setup(repo => repo.Add(post));
 
-            var firstPost = postSrvice.FindById(0);
-            Assert.Equal(firstPost, post);
-        }
+        var result = _postService.Add(post);
 
-        [Fact]
-        public void FindAll_AddSomePosts_FindAllShouldReturnCorrectResult()
-        {
-            var postService = createPostService();
+        Assert.Equal(post.Id, result);
+    }
 
-            var posts = new List<Post>();
-            //Add ten posts
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var post = new Post();
-                post.Id = i;
+    [Fact]
+    public void Add_SetsCreatedAtAndIsActiveFields()
+    {
+        var post = new Post();
+        _postService.Add(post);
+        Assert.True(post.IsActive);
+    }
 
-                posts.Add(post);
-                postService.Add(post);
-            }
+    [Fact]
+    public void ChangeVisibility_CallsPostRepositoryUpdateMethod()
+    {
+        var post = new Post { Id = 1, IsActive = true };
+        _postRepositoryMock.Setup(repo => repo.FindById(post.Id)).Returns(post);
 
-            Assert.Equal(posts, postService.FindAll());
-        }
+        _postService.ChangeVisibility(post.Id);
 
-        [Fact]
-        public void FindById_AddSomePosts_FindByIdShouldReturnCorrectResult()
-        {
-            var postService = createPostService();
+        _postRepositoryMock.Verify(repo => repo.Update(post), Times.Once);
+    }
 
-            var posts = new List<Post>();
-            //Add ten posts
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var post = new Post();
-                post.Id = i;
+    [Fact]
+    public void ChangeVisibility_ChangesPostVisibility()
+    {
+        var post = new Post { Id = 1, IsActive = true };
+        _postRepositoryMock.Setup(repo => repo.FindById(post.Id)).Returns(post);
 
-                posts.Add(post);
-                postService.Add(post);
-            }
+        _postService.ChangeVisibility(post.Id);
 
-            var expectedPost = new Post();
-            expectedPost.Id = 11;
+        Assert.False(post.IsActive);
+    }
 
-            postService.Add(expectedPost);
+    [Fact]
+    public void ChangeVisibility_InvalidPostId_DoesNothing()
+    {
+        var postId = 1;
+        _postRepositoryMock.Setup(repo => repo.FindById(postId)).Returns<Post>(null);
 
-            Assert.Equal(expectedPost, postService.FindById(11));
-        }
+        _postService.ChangeVisibility(postId);
 
-        [Fact]
-        public void Remove_RemovePost_PostServiceShouldSuccessfullyRemovePost()
-        {
-            var postService = createPostService();
+        _postRepositoryMock.Verify(repo => repo.Update(It.IsAny<Post>()), Times.Never);
+    }
 
-            Post post1 = new Post();
-            post1.Id = 0;
+    [Fact]
+    public void FindAll_ReturnsListOfPosts()
+    {
+        var posts = new List<Post> { new(), new() };
+        _postRepositoryMock.Setup(repo => repo.FindAll()).Returns(posts.AsQueryable());
 
-            Post post2 = new Post();
-            post2.Id = 1;
+        var result = _postService.FindAll();
 
-            postService.Add(post1);
-            postService.Add(post2);
+        Assert.Equal(posts, result);
+    }
 
-            postService.Remove(1);
+    [Fact]
+    public void FindAllByUserId_ReturnsListOfPostsByUserId()
+    {
+        const int userId = 1;
+        var posts = new List<Post> { new() { UserId = userId }, new() { UserId = 2 } };
+        _postRepositoryMock.Setup(repo => repo.FindAll()).Returns(posts.AsQueryable());
 
-            var allPosts = postService.FindAll();
+        var result = _postService.FindAllByUserId(userId);
 
-            Assert.Single(allPosts);
-            Assert.Equal(allPosts[0], post1);
-        }
+        Assert.Equal(posts.Where(p => p.UserId == userId).ToList(), result);
+    }
 
-        [Fact]
-        public void FindAllByUserId_AddSomePosts_FindAllByUserIdShouldReturnCorrectResult()
-        {
-            var postService = createPostService();
+    [Fact]
+    public void FindAllByPostType_ReturnsListOfPostsByPostType()
+    {
+        const int postType = 1;
+        var posts = new List<Post> { new() { Type = (PostType)postType }, new() { Type = PostType.Found } };
+        _postRepositoryMock.Setup(repo => repo.FindAll()).Returns(posts.AsQueryable());
 
-            var posts = new List<Post>();
-            //Add ten posts
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var post = new Post();
-                post.Id = i;
-                post.UserId = i;
+        var result = _postService.FindAllByPostType(postType);
 
-                posts.Add(post);
-                postService.Add(post);
-            }
+        Assert.Equal(posts.Where(p => (int)p.Type == postType).ToList(), result);
+    }
 
-            var expectedPost = new Post();
-            expectedPost.Id = 11;
-            expectedPost.UserId = 11;
+    [Fact]
+    public void FindById_ReturnsPostById()
+    {
+        var post = new Post { Id = 1 };
+        _postRepositoryMock.Setup(repo => repo.FindById(1)).Returns(post);
 
-            postService.Add(expectedPost);
+        var result = _postService.FindById(1);
 
-            var allForUser11 = postService.FindAllByUserId(11);
+        Assert.Equal(post, result);
+    }
 
-            Assert.Single(allForUser11);
-            Assert.Equal(expectedPost, allForUser11[0]);
-        }
+    [Fact]
+    public void Remove_CallsPostRepositoryRemoveMethod()
+    {
+        const int postId = 1;
 
-        [Fact]
-        public void FindAllByPostType_AddSomePosts_FindAllByPostTypeShouldReturnCorrectResult()
-        {
-            var postService = createPostService();
-
-            var lostPosts = new List<Post>();
-            //Add ten posts with different types
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var post = new Post();
-                post.Id = i;
-                if (i % 2 == 0)
-                {
-                    post.Type = PostType.Lost;
-                    lostPosts.Add(post);
-                }
-                else
-                    post.Type = PostType.Found;
-
-                postService.Add(post);
-            }
-
-            Assert.Equal(lostPosts, postService.FindAllByPostType((int)PostType.Lost));
-        }
-
-        [Fact]
-        public void ChangeVisibility_TryToChangeVisibility_VisibilityShouldSuccessfullyChange()
-        {
-            var postService = createPostService();
-
-            Post post = new Post();
-            post.Id = 0;
-            post.IsActive = true;
-
-            postService.Add(post);
-
-            postService.ChangeVisibility(0);
-
-            var firstPost = postService.FindById(0)!;
-            Assert.False(firstPost.IsActive);
-        }
+        _postService.Remove(postId);
+        _postRepositoryMock.Verify(repo => repo.Remove(postId), Times.Once);
     }
 }
