@@ -83,6 +83,32 @@ public class PetPostImageService : IPetPostImageService
 
         return petPosts;
     }
+    public IEnumerable<PetPostImageDto> FindAllPetPostImageByUser(string sortOrder, int userId)
+    {
+        var findAllPosts = _postService.FindAllByUserId(userId).Where(p => p.IsActive).ToList();
+        var findAllPets = _petService.FindAll();
+        var findAllImages = _imageService.FindAll();
+
+        var postsWithPets = from post in findAllPosts
+                            join pet in findAllPets on post.PetId equals pet.Id
+                            join image in findAllImages on pet.Id equals image.PetId
+                            select new PetPostImageDto
+                            {
+                                Post = post,
+                                Pet = pet,
+                                Image = image,
+                            };
+
+        IEnumerable<PetPostImageDto> petPosts = sortOrder switch
+        {
+            "lost_date" => postsWithPets.OrderByDescending(pp => pp.Post.Date),
+            "location" => postsWithPets.OrderByDescending(pp => pp.Post.Location),
+            "type" => postsWithPets.OrderByDescending(pp => pp.Post.Type),
+            _ => postsWithPets.OrderBy(pp => pp.Post.Date)
+        };
+
+        return petPosts;
+    }
 
     public PetPostImageDto FindByPostId(int id)
     {

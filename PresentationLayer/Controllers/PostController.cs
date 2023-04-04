@@ -51,7 +51,14 @@ public class PostController : Controller
             .FindAllPetPostImage(sortOrder));
         return View(petPosts);
     }
-
+    [HttpGet]
+    public IActionResult MyPosts(string sortOrder)
+    {
+        _logger.LogInformation("Show AllPosts..");
+        var petPosts = _mapper.Map<IEnumerable<PetPostImageViewModel>>(_petPostImageService
+            .FindAllPetPostImageByUser(sortOrder, 2));
+        return View("AllPosts", petPosts);
+    }
     [HttpGet]
     public IActionResult PostDetails(int id)
     {
