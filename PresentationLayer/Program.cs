@@ -1,6 +1,7 @@
 using BLL.Service;
 using BLL.Service.impl;
 using DAL.DataContext;
+using DAL.Init;
 using DAL.Model;
 using DAL.Repository;
 using DAL.Repository.impl;
@@ -28,7 +29,7 @@ builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 connectionString = connectionString!.Replace("DbPassword", builder.Configuration["DbPassword"]);
 
-builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+builder.Services.AddDefaultIdentity<User>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireLowercase = false;
@@ -37,9 +38,9 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
         options.Password.RequiredLength = 3;
         options.Password.RequiredUniqueChars = 0;
     })
+    .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<FindYourPetContext>()
-    .AddDefaultTokenProviders();
-
+    .AddDefaultTokenProviders();  
 builder.Services.Configure<PasswordHasherOptions>(options =>
     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2);
 
@@ -67,6 +68,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var rolesManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    await RoleInitializer.InitializeAsync(userManager, rolesManager, app.Configuration);
 }
 
 app.UseHttpsRedirection();

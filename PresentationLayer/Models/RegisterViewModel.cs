@@ -6,13 +6,17 @@ public class RegisterViewModel
 {
     [Required]
     [Display(Name = "Name")]
+    [RegularExpression(@"^[^0-9]+$", ErrorMessage = "Do not use digits")]
+
     public string Name { get; set; }
 
     [Required]
     [Display(Name = "Surname")]
+    [RegularExpression(@"^[^0-9]+$", ErrorMessage = "Do not use digits")]
     public string Surname { get; set; }
 
     [Required]
+    [EmailAddress]
     [Display(Name = "Email")]
     public string Email { get; set; }
 

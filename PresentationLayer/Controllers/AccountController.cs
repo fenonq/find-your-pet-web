@@ -35,31 +35,35 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Registration(RegisterViewModel model)
     {
-        var user = new User
+        if (ModelState.IsValid)
         {
-            UserName = model.Email,
-            Email = model.Email,
-            Name = model.Name,
-            Surname = model.Surname,
-        };
-        var result = await _userManager.CreateAsync(user, model.Password);
+            var user = new User
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                Name = model.Name,
+                Surname = model.Surname,
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-        if (result.Succeeded)
-        {
-            _logger.LogInformation("User created a new account with password.");
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.");
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            _logger.LogInformation("User is logged in.");
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                await _userManager.AddToRoleAsync(user, "user");
 
-            return RedirectToAction("Index", "Home");
+                _logger.LogInformation("User is logged in.");
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+                _logger.LogInformation("Error creating user: " + error.Description);
+            }
         }
-
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-            _logger.LogInformation("Error creating user: " + error.Description);
-        }
-
         return View(model);
     }
 
@@ -72,19 +76,30 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        var result = await _signInManager.PasswordSignInAsync(
-            model.Email,
-            model.Password,
-            model.RememberMe,
-            lockoutOnFailure: false);
-
-        if (result.Succeeded)
+        if (ModelState.IsValid)
         {
-            _logger.LogInformation("User logged in.");
-            return RedirectToAction("Index", "Home");
-        }
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
-        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            if (user == null)
+            {
+                ModelState.AddModelError(nameof(LoginViewModel.Email), "Email or password is incorrect");
+                return BadRequest(ModelState);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Email,
+                model.Password,
+                model.RememberMe,
+                lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User logged in.");
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError(string.Empty, "Email or password is incorrect");
+        }
         return View(model);
     }
 
