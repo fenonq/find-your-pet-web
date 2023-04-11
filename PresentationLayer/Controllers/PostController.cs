@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using BLL.Service;
 using DAL.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 
 namespace PresentationLayer.Controllers;
 
+[Authorize]
 public class PostController : Controller
 {
     private readonly IMapper _mapper;
@@ -44,6 +47,7 @@ public class PostController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult AllPosts(string sortOrder)
     {
         _logger.LogInformation("Show AllPosts..");
@@ -53,6 +57,7 @@ public class PostController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult PostDetails(int id)
     {
         _logger.LogInformation("Show PostDetails..");

@@ -1,9 +1,11 @@
 ﻿using DAL.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.DataContext;
 
-public class FindYourPetContext : DbContext
+public class FindYourPetContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
     public FindYourPetContext()
     {
@@ -14,7 +16,14 @@ public class FindYourPetContext : DbContext
     {
     }
 
-    public virtual DbSet<User> Users { get; set; }
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     if (!optionsBuilder.IsConfigured)
+    //     {
+    //         optionsBuilder.UseNpgsql("Server=localhost;port=5432;user id=postgres;" +
+    //                                  "password=root;database=find-your-pet;");
+    //     }
+    // }
 
     public virtual DbSet<Pet> Pets { get; set; }
 
@@ -24,48 +33,12 @@ public class FindYourPetContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.ToTable("users");
-
-            entity.HasKey(e => e.Id)
-                .HasName("users_pk");
-
-            entity.HasIndex(e => e.Login)
-                .IsUnique()
-                .HasDatabaseName("ulogin");
-
-            entity.Property(e => e.Id)
-                .UseIdentityAlwaysColumn()
-                .IsRequired()
-                .HasColumnName("id");
-
-            entity.Property(e => e.Name)
-                .HasMaxLength(128)
-                .IsRequired()
-                .HasColumnName("name");
-
-            entity.Property(e => e.Surname)
-                .HasMaxLength(128)
-                .IsRequired()
-                .HasColumnName("surname");
-
-            entity.Property(e => e.Login)
-                .HasMaxLength(128)
-                .IsRequired()
-                .HasColumnName("login");
-
-            entity.Property(e => e.Password)
-                .HasMaxLength(128)
-                .HasColumnName("password");
-        });
-
         modelBuilder.Entity<Pet>(entity =>
         {
+            entity.ToTable("Pets");
+
             entity.HasKey(e => e.Id)
                 .HasName("pets_pk");
-
-            entity.ToTable("pets");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
@@ -91,10 +64,10 @@ public class FindYourPetContext : DbContext
 
         modelBuilder.Entity<Post>(entity =>
         {
+            entity.ToTable("Posts");
+
             entity.HasKey(e => e.Id)
                 .HasName("posts_pk");
-
-            entity.ToTable("posts");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
@@ -142,10 +115,10 @@ public class FindYourPetContext : DbContext
 
         modelBuilder.Entity<Image>(entity =>
         {
+            entity.ToTable("Images");
+
             entity.HasKey(e => e.Id)
                 .HasName("image_pk");
-
-            entity.ToTable("images");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
@@ -163,5 +136,7 @@ public class FindYourPetContext : DbContext
                 .HasForeignKey<Image>(i => i.PetId)
                 .HasConstraintName("fc_pet");
         });
+
+        base.OnModelCreating(modelBuilder);
     }
 }

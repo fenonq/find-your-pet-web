@@ -1,19 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace DAL.Model;
 
-public class User
+public class User : IdentityUser<int>
 {
-    public int Id { get; set; }
-
     public string Name { get; set; }
 
     public string Surname { get; set; }
-
-    public string Login { get; set; }
-
-    public string Password { get; set; }
 
     [NotMapped]
     public IFormFile Photo { get; set; }
