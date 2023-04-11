@@ -1,4 +1,5 @@
-﻿using DAL.Model;
+﻿using BLL.Service;
+using DAL.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,18 +12,18 @@ public class AccountController : Controller
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly ILogger<AccountController> _logger;
-    private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IImageService _imageService;
 
     public AccountController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ILogger<AccountController> logger,
-        IWebHostEnvironment webHostEnvironment)
+        IImageService imageService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger;
-        _webHostEnvironment = webHostEnvironment;
+        _imageService = imageService;
     }
 
     [HttpGet]
@@ -100,18 +101,7 @@ public class AccountController : Controller
     public async Task<IActionResult> UserProfile()
     {
         var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", currentUser.Id + ".jpg");
-        if (System.IO.File.Exists(path))
-        {
-            currentUser.PhotoPath = "/userPhotos/" + currentUser.Id + ".jpg";
-        }
-        else
-        {
-            currentUser.PhotoPath = "/userPhotos/" + "default.png";
-        }
-
-        Console.WriteLine(path);
+        currentUser.PhotoPath = _imageService.GetUserImage(currentUser);
 
         _logger.LogInformation("Show account..");
         return View(currentUser);
@@ -122,22 +112,8 @@ public class AccountController : Controller
     public async Task<IActionResult> UploadUserPhoto(User model)
     {
         var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-
-        if (model.Photo.Length <= 0)
-        {
-            return View("UserProfile", currentUser);
-        }
-
-        var fileName = currentUser.Id + Path.GetExtension(model.Photo.FileName);
-        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", fileName);
-        await using (var stream = new FileStream(path, FileMode.Create))
-        {
-            await model.Photo.CopyToAsync(stream);
-        }
-
-        currentUser.PhotoPath = "/userPhotos/" + fileName;
-        Console.WriteLine(path);
-
-        return View("UserProfile", currentUser);
+        var uploadSuccess = _imageService.UploadUserPhoto(currentUser, model.Photo);
+        // !uploadSuccess = add showing error or smth??
+        return RedirectToAction("UserProfile", "Account", model);
     }
 }
