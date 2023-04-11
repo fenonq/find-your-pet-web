@@ -10,5 +10,7 @@ public interface IPetPostImageService
 
     IEnumerable<PetPostImageDto> FindAllPetPostImage(string sortOrder);
 
+    IEnumerable<PetPostImageDto> FindAllPetPostImageByUser(string sortOrder, int userId);
+
     PetPostImageDto? FindByPostId(int id);
 }
