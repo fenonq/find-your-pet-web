@@ -13,6 +13,7 @@ public class PostController : Controller
 {
     private readonly IMapper _mapper;
     private readonly IPostService _postService;
+    private readonly UserManager<User> _userManager;
     private readonly ILogger<AccountController> _logger;
     private readonly IPetPostImageService _petPostImageService;
 
@@ -20,12 +21,14 @@ public class PostController : Controller
         IMapper mapper,
         IPostService postService,
         ILogger<AccountController> logger,
-        IPetPostImageService petPostImageService)
+        IPetPostImageService petPostImageService,
+        UserManager<User> userManager)
     {
         _logger = logger;
         _mapper = mapper;
         _postService = postService;
         _petPostImageService = petPostImageService;
+        _userManager = userManager;
     }
 
     [HttpGet]
@@ -36,12 +39,13 @@ public class PostController : Controller
     }
 
     [HttpPost]
-    public IActionResult CreatePost(PetPostImageViewModel model)
+    public async Task<IActionResult> CreatePost(PetPostImageViewModel model)
     {
         _logger.LogInformation("Creating post..");
         var pet = _mapper.Map<Pet>(model.Pet);
         var post = _mapper.Map<Post>(model.Post);
-        _petPostImageService.AddPetPostImage(post, pet, model.Post.Photo);
+        var user = await _userManager.GetUserAsync(User);
+        _petPostImageService.AddPetPostImage(post, pet, user.Id, model.Post.Photo);
         _logger.LogInformation("Post successfully created");
         return RedirectToAction("Index", "Home");
     }
@@ -55,14 +59,17 @@ public class PostController : Controller
             .FindAllPetPostImage(sortOrder));
         return View(petPosts);
     }
+
     [HttpGet]
-    public IActionResult MyPosts(string sortOrder)
+    public async Task<IActionResult> MyPosts(string sortOrder)
     {
         _logger.LogInformation("Show AllPosts..");
+        var user = await _userManager.GetUserAsync(User);
         var petPosts = _mapper.Map<IEnumerable<PetPostImageViewModel>>(_petPostImageService
-            .FindAllPetPostImageByUser(sortOrder, 2));
+            .FindAllPetPostImageByUser(sortOrder, user.Id));
         return View("AllPosts", petPosts);
     }
+
     [HttpGet]
     [AllowAnonymous]
     public IActionResult PostDetails(int id)

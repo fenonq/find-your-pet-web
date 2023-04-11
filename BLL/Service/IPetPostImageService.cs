@@ -6,7 +6,7 @@ namespace BLL.Service;
 
 public interface IPetPostImageService
 {
-    int AddPetPostImage(Post post, Pet pet, IFormFile image);
+    int AddPetPostImage(Post post, Pet pet, int userId, IFormFile image);
 
     IEnumerable<PetPostImageDto> FindAllPetPostImage(string sortOrder);
 

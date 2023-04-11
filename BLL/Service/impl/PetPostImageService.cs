@@ -24,16 +24,16 @@ public class PetPostImageService : IPetPostImageService
         _webHostEnvironment = webHostEnvironment;
     }
 
-    public int AddPetPostImage(Post post, Pet pet, IFormFile image)
+    public int AddPetPostImage(Post post, Pet pet, int userId, IFormFile image)
     {
         post.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
         post.IsActive = true;
 
-        pet.OwnerId = 1;
+        pet.OwnerId = userId;
         _petService.Add(pet);
 
         post.PetId = pet.Id;
-        post.UserId = 1;
+        post.UserId = userId;
         var postId = _postService.Add(post);
 
         if (image.Length <= 0)
@@ -83,6 +83,7 @@ public class PetPostImageService : IPetPostImageService
 
         return petPosts;
     }
+
     public IEnumerable<PetPostImageDto> FindAllPetPostImageByUser(string sortOrder, int userId)
     {
         var findAllPosts = _postService.FindAllByUserId(userId).Where(p => p.IsActive).ToList();
@@ -90,14 +91,14 @@ public class PetPostImageService : IPetPostImageService
         var findAllImages = _imageService.FindAll();
 
         var postsWithPets = from post in findAllPosts
-                            join pet in findAllPets on post.PetId equals pet.Id
-                            join image in findAllImages on pet.Id equals image.PetId
-                            select new PetPostImageDto
-                            {
-                                Post = post,
-                                Pet = pet,
-                                Image = image,
-                            };
+            join pet in findAllPets on post.PetId equals pet.Id
+            join image in findAllImages on pet.Id equals image.PetId
+            select new PetPostImageDto
+            {
+                Post = post,
+                Pet = pet,
+                Image = image,
+            };
 
         IEnumerable<PetPostImageDto> petPosts = sortOrder switch
         {

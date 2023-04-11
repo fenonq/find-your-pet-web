@@ -45,7 +45,7 @@ public class PetPostImageServiceTests
         _mockPostService.Setup(p => p.Add(post)).Returns(expectedPostId);
         _mockWebHostEnvironment.Setup(w => w.WebRootPath).Returns(webRootPath);
 
-        var result = _petPostImageService.AddPetPostImage(post, pet, formFile.Object);
+        var result = _petPostImageService.AddPetPostImage(post, pet, 1, formFile.Object);
 
         Assert.Equal(expectedPostId, result);
         _mockImageService.Verify(i => i.Add(It.IsAny<Image>()), Times.Once);
@@ -65,22 +65,38 @@ public class PetPostImageServiceTests
         _mockPetService.Setup(p => p.Add(pet)).Returns(pet.Id);
         _mockPostService.Setup(p => p.Add(post)).Returns(expectedPostId);
 
-        var result = _petPostImageService.AddPetPostImage(post, pet, formFile.Object);
+        var result = _petPostImageService.AddPetPostImage(post, pet, 1, formFile.Object);
 
         Assert.Equal(expectedPostId, result);
         _mockImageService.Verify(i => i.Add(It.IsAny<Image>()), Times.Never);
     }
-    
+
     [Fact]
     public void FindAllPetPostImage_WithValidSortOrder_ReturnsSortedPetPostImageDtos()
     {
         var sortOrder = "lost_date";
         var posts = new List<Post>
         {
-            new() { Id = 1, IsActive = true, Date = new DateOnly(2022, 1, 1), Location = "A", Type = PostType.Lost, PetId = 1},
-            new() { Id = 2, IsActive = true, Date = new DateOnly(2022, 1, 2), Location = "B", Type = PostType.Found, PetId = 2 },
-            new() { Id = 3, IsActive = true, Date = new DateOnly(2022, 1, 3), Location = "C", Type = PostType.Lost, PetId = 3 },
-            new() { Id = 4, IsActive = true, Date = new DateOnly(2022, 1, 4), Location = "D", Type = PostType.Found, PetId = 4 }
+            new()
+            {
+                Id = 1, IsActive = true, Date = new DateOnly(2022, 1, 1), Location = "A", Type = PostType.Lost,
+                PetId = 1
+            },
+            new()
+            {
+                Id = 2, IsActive = true, Date = new DateOnly(2022, 1, 2), Location = "B", Type = PostType.Found,
+                PetId = 2
+            },
+            new()
+            {
+                Id = 3, IsActive = true, Date = new DateOnly(2022, 1, 3), Location = "C", Type = PostType.Lost,
+                PetId = 3
+            },
+            new()
+            {
+                Id = 4, IsActive = true, Date = new DateOnly(2022, 1, 4), Location = "D", Type = PostType.Found,
+                PetId = 4
+            }
         };
         var images = new List<Image>
         {
@@ -91,10 +107,10 @@ public class PetPostImageServiceTests
         };
         var pets = new List<Pet>
         {
-            new() { Id = 1, Name = "1", Age = 1, Description = "1"},
-            new() { Id = 2, Name = "2", Age = 2, Description = "2"},
-            new() { Id = 3, Name = "3", Age = 3, Description = "3"},
-            new() { Id = 4, Name = "4", Age = 4, Description = "4"}
+            new() { Id = 1, Name = "1", Age = 1, Description = "1" },
+            new() { Id = 2, Name = "2", Age = 2, Description = "2" },
+            new() { Id = 3, Name = "3", Age = 3, Description = "3" },
+            new() { Id = 4, Name = "4", Age = 4, Description = "4" }
         };
         var expectedDto = new List<PetPostImageDto>
         {
@@ -129,10 +145,10 @@ public class PetPostImageServiceTests
         _mockImageService.Setup(i => i.FindAll()).Returns(images);
 
         var result = _petPostImageService.FindAllPetPostImage(sortOrder);
-        
+
         Assert.Equal(expectedDto[0].Post, result.ToList()[0].Post);
     }
-    
+
     [Fact]
     public void FindByPostId_WithValidPostId_ReturnsPetPostImageDto()
     {
@@ -140,7 +156,7 @@ public class PetPostImageServiceTests
         var post = new Post { Id = postId, PetId = 1 };
         var pet = new Pet { Id = 1 };
         var image = new Image { Id = 1, PetId = 1 };
-    
+
         _mockPostService.Setup(p => p.FindById(postId)).Returns(post);
         _mockPetService.Setup(p => p.FindById(post.PetId)).Returns(pet);
         _mockImageService.Setup(i => i.FindByPetId(post.PetId)).Returns(image);
