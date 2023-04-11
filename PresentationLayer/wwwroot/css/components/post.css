@@ -62,22 +62,6 @@
     transform: rotateY(180deg);
     right: 0;
 }
-
-/*.post-content button:focus span {
-    visibility: visible;
-    opacity: 1;
-}
-.post-content button:not(:focus)::after {
-    content: "Contact owner";
-    transition-delay: .4s;
-    transform: translate(150%,0);
-}
-.post-content button:not(:focus) span {
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 0s, opacity 0.5s linear;
-}
-*/
 .post-content .post-info {
     width: 50%;
     padding: 2rem 0;

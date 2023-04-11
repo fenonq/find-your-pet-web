@@ -19,7 +19,6 @@
     display: flex;
 }
 .main-content .main-info > div button {
-    background-color: #f49351;
     color: white;
 }
 .main-content .main-info p {
