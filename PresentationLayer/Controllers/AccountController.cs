@@ -1,7 +1,6 @@
-﻿using AutoMapper;
-using BLL.Service;
-using BLL.Service.impl;
-using DAL.Model;
+﻿using DAL.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 
@@ -9,80 +8,136 @@ namespace PresentationLayer.Controllers;
 
 public class AccountController : Controller
 {
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
     private readonly ILogger<AccountController> _logger;
-    private readonly IUserService _userService;
-    private readonly IMapper _mapper;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     public AccountController(
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
         ILogger<AccountController> logger,
-        IUserService userService,
-        IMapper mapper,
         IWebHostEnvironment webHostEnvironment)
     {
+        _userManager = userManager;
+        _signInManager = signInManager;
         _logger = logger;
-        _userService = userService;
-        _mapper = mapper;
         _webHostEnvironment = webHostEnvironment;
     }
 
     [HttpGet]
     public IActionResult Registration()
     {
-        _logger.LogInformation("Show registration form..");
         return View();
     }
 
     [HttpPost]
-    public IActionResult Registration(RegisterViewModel model)
+    public async Task<IActionResult> Registration(RegisterViewModel model)
     {
-        _logger.LogInformation("Registering user..");
-        if (!ModelState.IsValid)
+        var user = new User
         {
-            _logger.LogInformation("Wrong input data!");
-            return View(model);
+            UserName = model.Email,
+            Email = model.Email,
+            Name = model.Name,
+            Surname = model.Surname,
+        };
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("User created a new account with password.");
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            _logger.LogInformation("User is logged in.");
+
+            return RedirectToAction("Index", "Home");
         }
 
-        _userService.Add(_mapper.Map<User>(model));
-        _logger.LogInformation("Successfully registered");
-        return RedirectToAction("Index", "Home");
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+            _logger.LogInformation("Error creating user: " + error.Description);
+        }
+
+        return View(model);
     }
 
     [HttpGet]
-    public IActionResult UserProfile()
+    public IActionResult Login()
     {
-        var current_user = _userService.FindById(2);
-        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", current_user.Id.ToString() + ".jpg");
-        if (System.IO.File.Exists(path))
-        {
-            current_user.PhotoPath = "/userPhotos/" + current_user.Id.ToString() + ".jpg";
-        }
-        else
-        {
-            current_user.PhotoPath = "/userPhotos/" + "default.png";
-        }
-
-        _logger.LogInformation("Show account..");
-        return View(current_user);
+        return View();
     }
 
     [HttpPost]
-    public IActionResult UploadUserPhoto(User model)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
-        var current_user = _userService.FindById(2);
+        var result = await _signInManager.PasswordSignInAsync(
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: false);
 
-        if (model.Photo.Length > 0)
+        if (result.Succeeded)
         {
-            var fileName = current_user.Id + Path.GetExtension(model.Photo.FileName);
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", fileName);
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                model.Photo.CopyTo(stream);
-            }
-
-            current_user.PhotoPath = "/userPhotos/" + fileName;
+            _logger.LogInformation("User logged in.");
+            return RedirectToAction("Index", "Home");
         }
 
-        return View("UserProfile", current_user);
+        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        _logger.LogInformation("User logged out.");
+        return RedirectToAction("Login", "Account");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> UserProfile()
+    {
+        var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", currentUser.Id + ".jpg");
+        if (System.IO.File.Exists(path))
+        {
+            currentUser.PhotoPath = "/userPhotos/" + currentUser.Id + ".jpg";
+        }
+        else
+        {
+            currentUser.PhotoPath = "/userPhotos/" + "default.png";
+        }
+
+        Console.WriteLine(path);
+
+        _logger.LogInformation("Show account..");
+        return View(currentUser);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> UploadUserPhoto(User model)
+    {
+        var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+        if (model.Photo.Length <= 0)
+        {
+            return View("UserProfile", currentUser);
+        }
+
+        var fileName = currentUser.Id + Path.GetExtension(model.Photo.FileName);
+        var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", fileName);
+        await using (var stream = new FileStream(path, FileMode.Create))
+        {
+            await model.Photo.CopyToAsync(stream);
+        }
+
+        currentUser.PhotoPath = "/userPhotos/" + fileName;
+        Console.WriteLine(path);
+
+        return View("UserProfile", currentUser);
     }
 }

@@ -1,147 +1,103 @@
-using BLL.Service.impl;
-using DAL.DataContext;
-using DAL.Model;
-using DAL.Repository.impl;
-using EntityFrameworkCoreMock;
-
-namespace Tests
-{
-    public class UserServiceTests
-    {
-
-        UserService createUserService()
-        {
-            var dbContextMock = new DbContextMock<FindYourPetContext>();
-            dbContextMock.CreateDbSetMock(x => x.Users, new List<User>());
-            UserRepository repository = new UserRepository(dbContextMock.Object);
-            return new UserService(repository);
-        }
-
-        [Fact]
-        public void Add_AddSingleUser_UserServiceShouldContainOnlyOneUser()
-        {
-            var userService = createUserService();
-
-            User user1 = new User();
-            user1.Name = "Test User";
-            user1.Id = 0;
-
-            userService.Add(user1);
-
-            var allUsers = userService.FindAll();
-            Assert.Single(allUsers);
-
-            var firstUser =  userService.FindById(0);
-            Assert.Equal(firstUser, user1);
-        }
-
-        [Fact]
-        public void Remove_RemoveUser_UserServiceShouldSuccessfullyRemoveUser()
-        {
-            var userService = createUserService();
-
-            User user1 = new User();
-            user1.Name = "Test User1";
-            user1.Id = 0;
-
-            User user2 = new User();
-            user2.Name = "Test User2";
-            user2.Id = 1;
-
-            userService.Add(user1);
-            userService.Add(user2);
-
-            userService.Remove(1);
-
-            var allUsers = userService.FindAll();
-
-            Assert.Single(allUsers);
-            Assert.Equal(allUsers[0], user1);
-        }
-
-        [Fact]
-        public void LoginUser_UserWithCorrectPassword_UserShouldSuccessfullyLogin()
-        {
-            var userService = createUserService();
-
-            var login = "test@gmail.com";
-            var pass = "1111";
-
-            User user1 = new User();
-            user1.Name = "Test User";
-            user1.Id = 0;
-            user1.Login = login;
-            user1.Password = pass;
-
-            userService.Add(user1);
-
-            Assert.True(userService.LoginUser(login, pass));
-        }
-
-        [Fact]
-        public void LoginUser_UserWithInCorrectPassword_UserShouldFailedLogin()
-        {
-            var userService = createUserService();
-
-            var login = "test@gmail.com";
-            var pass = "1111";
-
-            User user1 = new User();
-            user1.Name = "Test User";
-            user1.Id = 0;
-            user1.Login = login;
-            user1.Password = "another_pass";
-
-            userService.Add(user1);
-
-            Assert.False(userService.LoginUser(login, pass));
-        }
-
-
-        [Fact]
-        public void FindAll_AddSomeUsers_FindAllShouldReturnCorrectResult()
-        {
-            var userService = createUserService();
-
-            var users = new List<User>();
-            //Add ten users
-            foreach(var i in Enumerable.Range(0, 10))
-            {
-                var user = new User();
-                user.Id = i;
-                user.Name = "Test Name";;
-
-                users.Add(user);
-                userService.Add(user);
-            }
-
-            Assert.Equal(users, userService.FindAll());
-        }
-
-        [Fact]
-        public void FindById_AddSomeUsers_FindByIdShouldReturnCorrectResult()
-        {
-            var userService = createUserService();
-
-            var users = new List<User>();
-            //Add ten users
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var user = new User();
-                user.Id = i;
-                user.Name = "Test Name";
-
-                users.Add(user);
-                userService.Add(user);
-            }
-
-            var expectedUser = new User();
-            expectedUser.Id = 11;
-            expectedUser.Name = "Expected User";
-
-            userService.Add(expectedUser);
-
-            Assert.Equal(expectedUser, userService.FindById(11));
-        }
-    }
-}
+// using BLL.Service.impl;
+// using DAL.Model;
+// using DAL.Repository;
+// using Moq;
+//
+// namespace Tests;
+//
+// public class UserServiceTests
+// {
+//     private readonly Mock<IUserRepository> _userRepositoryMock;
+//     private readonly UserService _userService;
+//
+//     public UserServiceTests()
+//     {
+//         _userRepositoryMock = new Mock<IUserRepository>();
+//         _userService = new UserService(_userRepositoryMock.Object);
+//     }
+//
+//     [Fact]
+//     public void FindAll_ReturnsListOfUsers()
+//     {
+//         var users = new List<User> { new(), new() };
+//         _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(users.AsQueryable());
+//
+//         var result = _userService.FindAll();
+//
+//         Assert.Equal(users, result);
+//     }
+//
+//     [Fact]
+//     public void FindById_ReturnsUserById()
+//     {
+//         var user = new User { Id = 1 };
+//         _userRepositoryMock.Setup(repo => repo.FindById(1)).Returns(user);
+//
+//         var result = _userService.FindById(1);
+//
+//         Assert.Equal(user, result);
+//     }
+//
+//     [Fact]
+//     public void Add_CallsUserRepositoryAddMethod()
+//     {
+//         var user = new User { Name = "John", Login = "johndoe", Password = "password" };
+//
+//         _userService.Add(user);
+//
+//         _userRepositoryMock.Verify(repo => repo.Add(user), Times.Once);
+//     }
+//
+//     [Fact]
+//     public void Add_ReturnsUserId()
+//     {
+//         var user = new User { Name = "John", Login = "johndoe", Password = "password", Id = 1 };
+//         _userRepositoryMock.Setup(repo => repo.Add(user));
+//
+//         var result = _userService.Add(user);
+//
+//         Assert.Equal(user.Id, result);
+//     }
+//
+//     [Fact]
+//     public void LoginUser_ReturnsTrueIfCredentialsAreValid()
+//     {
+//         var user = new User { Login = "johndoe", Password = "password" };
+//         _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(new List<User> { user }.AsQueryable());
+//
+//         var result = _userService.LoginUser("johndoe", "password");
+//
+//         Assert.True(result);
+//     }
+//
+//     [Fact]
+//     public void LoginUser_ReturnsFalseIfUserDoesNotExist()
+//     {
+//         _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(new List<User>().AsQueryable());
+//
+//         var result = _userService.LoginUser("johndoe", "password");
+//
+//         Assert.False(result);
+//     }
+//
+//     [Fact]
+//     public void LoginUser_ReturnsFalseIfPasswordIsIncorrect()
+//     {
+//         var user = new User { Login = "johndoe", Password = "password" };
+//         _userRepositoryMock.Setup(repo => repo.FindAll()).Returns(new List<User> { user }.AsQueryable());
+//
+//         var result = _userService.LoginUser("johndoe", "wrongpassword");
+//
+//         Assert.False(result);
+//     }
+//
+//     [Fact]
+//     public void Remove_CallsUserRepositoryRemoveMethod()
+//     {
+//         const int userId = 1;
+//
+//         _userService.Remove(userId);
+//
+//         _userRepositoryMock.Verify(repo => repo.Remove(userId), Times.Once);
+//     }
+// }

@@ -1,104 +1,71 @@
-﻿
-using BLL.Service.impl;
-using DAL.DataContext;
+﻿using BLL.Service.impl;
 using DAL.Model;
-using DAL.Repository.impl;
-using EntityFrameworkCoreMock;
+using DAL.Repository;
+using Moq;
 
-namespace Tests
+namespace Tests;
+
+public class ImageServiceTests
 {
-    public class ImageServiceTests
+    private readonly Mock<IImageRepository> _imageRepositoryMock;
+    private readonly ImageService _imageService;
+
+    public ImageServiceTests()
     {
+        _imageRepositoryMock = new Mock<IImageRepository>();
+        _imageService = new ImageService(_imageRepositoryMock.Object);
+    }
 
-        ImageService createImageService()
-        {
-            var dbContextMock = new DbContextMock<FindYourPetContext>();
-            dbContextMock.CreateDbSetMock(x => x.Images, new List<Image>());
-            var repository = new ImageRepository(dbContextMock.Object);
-            return new ImageService(repository);
-        }
+    [Fact]
+    public void FindAll_ReturnsAllImages()
+    {
+        var images = new List<Image> { new Image { Id = 1 }, new Image { Id = 2 } };
+        _imageRepositoryMock.Setup(repo => repo.FindAll()).Returns(images.AsQueryable());
 
-        [Fact]
-        public void Add_AddImage_ImageServiceShouldContainOnlyOneImage()
-        {
-            var imageSrvice = createImageService();
+        var result = _imageService.FindAll();
 
-            Image image = new Image();
-            image.Id = 0;
+        Assert.Equal(images, result);
+    }
 
-            imageSrvice.Add(image);
+    [Fact]
+    public void FindById_ReturnsCorrectImage()
+    {
+        var image = new Image { Id = 1 };
+        _imageRepositoryMock.Setup(repo => repo.FindById(1)).Returns(image);
 
-            var allImages = imageSrvice.FindAll();
-            Assert.Single(allImages);
+        var result = _imageService.FindById(1);
 
-            var firstImage = imageSrvice.FindById(0);
-            Assert.Equal(firstImage, image);
-        }
+        Assert.Equal(image, result);
+    }
 
-        [Fact]
-        public void Remove_RemoveImage_ImageServiceShouldSuccessfullyRemoveImage()
-        {
-            var imageService = createImageService();
+    [Fact]
+    public void FindByPetId_ReturnsCorrectImage()
+    {
+        var images = new List<Image> { new() { Id = 1, PetId = 2 }, new() { Id = 2, PetId = 3 } };
+        _imageRepositoryMock.Setup(repo => repo.FindAll()).Returns(images.AsQueryable());
 
-            Image image1 = new Image();
-            image1.Id = 0;
+        var result = _imageService.FindByPetId(2);
 
-            Image image2 = new Image();
-            image2.Id = 1;
+        Assert.Equal(images.First(), result);
+    }
 
-            imageService.Add(image1);
-            imageService.Add(image2);
+    [Fact]
+    public void Add_CallsRepositoryAddMethod()
+    {
+        var image = new Image { Id = 1 };
 
-            imageService.Remove(1);
+        _imageService.Add(image);
 
-            var allImages = imageService.FindAll();
+        _imageRepositoryMock.Verify(repo => repo.Add(image), Times.Once);
+    }
 
-            Assert.Single(allImages);
-            Assert.Equal(allImages[0], image1);
-        }
+    [Fact]
+    public void Remove_CallsRepositoryRemoveMethod()
+    {
+        var id = 1;
 
-        [Fact]
-        public void FindAll_AddSomeImages_FindAllShouldReturnCorrectResult()
-        {
-            var imageService = createImageService();
+        _imageService.Remove(id);
 
-            var images = new List<Image>();
-            //Add ten images
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var image = new Image();
-                image.Id = i;
-
-                images.Add(image);
-                imageService.Add(image);
-            }
-
-            Assert.Equal(images, imageService.FindAll());
-        }
-
-        [Fact]
-        public void FindById_AddSomeImages_FindByIdShouldReturnCorrectResult()
-        {
-            var imageService = createImageService();
-
-            var images = new List<Image>();
-            //Add ten images
-            foreach (var i in Enumerable.Range(0, 10))
-            {
-                var image = new Image();
-                image.Id = i;
-
-                images.Add(image);
-                imageService.Add(image);
-            }
-
-            var expectedImage = new Image();
-            expectedImage.Id = 11;
-
-            imageService.Add(expectedImage);
-
-            Assert.Equal(expectedImage, imageService.FindById(11));
-        }
-
+        _imageRepositoryMock.Verify(repo => repo.Remove(id), Times.Once);
     }
 }

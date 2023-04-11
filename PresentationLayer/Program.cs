@@ -4,10 +4,10 @@ using DAL.DataContext;
 using DAL.Model;
 using DAL.Repository;
 using DAL.Repository.impl;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PresentationLayer.Mappings;
 using Serilog;
-using Serilog.Formatting.Compact;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,17 +16,39 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IPetRepository, PetRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+// builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPetPostImageService, PetPostImageService>();
 
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 connectionString = connectionString!.Replace("DbPassword", builder.Configuration["DbPassword"]);
+
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredLength = 3;
+        options.Password.RequiredUniqueChars = 0;
+    })
+    .AddEntityFrameworkStores<FindYourPetContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<PasswordHasherOptions>(options =>
+    options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2);
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/Login";
+});
 
 builder.Services.AddDbContext<FindYourPetContext>(options =>
     options.UseNpgsql(connectionString));
@@ -52,6 +74,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

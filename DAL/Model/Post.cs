@@ -1,6 +1,6 @@
-﻿namespace DAL.Model;
+﻿using DAL.Model.Enum;
 
-using Enum;
+namespace DAL.Model;
 
 public class Post
 {

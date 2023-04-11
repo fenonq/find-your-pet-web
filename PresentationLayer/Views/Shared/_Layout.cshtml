@@ -26,11 +26,19 @@
                         <a class="nav-link text-dark" asp-area="" asp-controller="Post" asp-action="AllPosts">All posts</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Post" asp-action="MyPosts">My posts</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Registration">Registration</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="UserProfile">Profile</a>
                     </li>
+                    <form asp-action="Logout" asp-controller="Account" method="post">
+
+                        <button type="submit">Logout</button>
+
+                    </form>
                 </ul>
             </div>
         </div>

@@ -1,37 +1,32 @@
-﻿using DAL.Model;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using PresentationLayer.Models;
 
 namespace PresentationLayer.Controllers;
-
-using System.Diagnostics;
-using BLL.Service;
-using Microsoft.AspNetCore.Mvc;
-using Models;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly IUserService _userService;
 
-    public HomeController(ILogger<HomeController> logger, IUserService userService)
+    public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
-        _userService = userService;
     }
 
     public IActionResult Index()
     {
         _logger.LogInformation("Test information..");
-        _userService.Add(new User
-        {
-            Name = "test",
-            Surname = "test",
-            Login = "test",
-            Password = "test",
-        });
-        ViewBag.User = _userService.FindAll()[0].Name;
+        // _userService.Add(new User
+        // {
+        //     Name = "test",
+        //     Surname = "test",
+        //     Login = "test",
+        //     Password = "test",
+        // });
+        // ViewBag.User = _userService.FindAll()[0].Name;
         return View();
     }
-     
+
     public IActionResult Privacy()
     {
         return View();

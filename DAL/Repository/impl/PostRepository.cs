@@ -1,7 +1,7 @@
-﻿namespace DAL.Repository.impl;
+﻿using DAL.DataContext;
+using DAL.Model;
 
-using DataContext;
-using Model;
+namespace DAL.Repository.impl;
 
 public class PostRepository : IPostRepository
 {

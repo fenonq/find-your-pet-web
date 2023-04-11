@@ -1,6 +1,6 @@
 ﻿namespace PresentationLayer.Models;
 
-public class PetPostViewModel
+public class PetPostImageViewModel
 {
     public PostViewModel Post { get; set; }
 

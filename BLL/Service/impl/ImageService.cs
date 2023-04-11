@@ -1,7 +1,7 @@
-﻿namespace BLL.Service.impl;
-
-using DAL.Model;
+﻿using DAL.Model;
 using DAL.Repository;
+
+namespace BLL.Service.impl;
 
 public class ImageService : IImageService
 {
@@ -24,7 +24,7 @@ public class ImageService : IImageService
 
     public Image FindByPetId(int petId)
     {
-        return _imageRepository.FindAll().Where(p => p.PetId == petId).FirstOrDefault();
+        return _imageRepository.FindAll().FirstOrDefault(p => p.PetId == petId);
     }
 
     public int Add(Image image)
