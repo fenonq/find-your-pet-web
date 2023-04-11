@@ -1,6 +1,7 @@
 ﻿using BLL.Service.impl;
 using DAL.Model;
 using DAL.Repository;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 
 namespace Tests;
@@ -9,11 +10,13 @@ public class ImageServiceTests
 {
     private readonly Mock<IImageRepository> _imageRepositoryMock;
     private readonly ImageService _imageService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
 
     public ImageServiceTests()
     {
         _imageRepositoryMock = new Mock<IImageRepository>();
-        _imageService = new ImageService(_imageRepositoryMock.Object);
+        _imageService = new ImageService(_imageRepositoryMock.Object, _webHostEnvironment);
     }
 
     [Fact]
