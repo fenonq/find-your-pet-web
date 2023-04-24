@@ -1,9 +1,15 @@
 ﻿using BLL.Service;
 using DAL.Model;
+using EmailSender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PresentationLayer.Models;
+using System.Security.Cryptography;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+
 
 namespace PresentationLayer.Controllers;
 
@@ -13,17 +19,21 @@ public class AccountController : Controller
     private readonly SignInManager<User> _signInManager;
     private readonly ILogger<AccountController> _logger;
     private readonly IImageService _imageService;
+    private readonly IEmailService _emailSender;
+
 
     public AccountController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ILogger<AccountController> logger,
-        IImageService imageService)
+        IImageService imageService,
+        IEmailService emailSender)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger;
         _imageService = imageService;
+        _emailSender = emailSender;
     }
 
     [HttpGet]
@@ -45,17 +55,19 @@ public class AccountController : Controller
                 Surname = model.Surname,
             };
             var result = await _userManager.CreateAsync(user, model.Password);
-
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
+                var userEmail = await _userManager.Users.FirstOrDefaultAsync(a => a.Email == user.Email);
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                await _userManager.AddToRoleAsync(user, "user");
+                var message = new Message(user.Email, "Completed!", confirmationLink);
 
-                _logger.LogInformation("User is logged in.");
+                _emailSender.SendEmail(message);
 
-                return RedirectToAction("Index", "Home");
+
+                return View("ErrorRegistration");
             }
 
             foreach (var error in result.Errors)
@@ -64,7 +76,30 @@ public class AccountController : Controller
                 _logger.LogInformation("Error creating user: " + error.Description);
             }
         }
+
         return View(model);
+    }
+
+
+    [HttpGet]
+    [AllowAnonymous]
+
+    public async Task<IActionResult> ConfirmEmail(string token, string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return View("Error");
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        return View(result.Succeeded ? nameof(ConfirmEmail) : "Error");
+    }
+
+    [HttpGet]
+    public IActionResult SuccessRegistration()
+    {
+        return View();
     }
 
     [HttpGet]
@@ -83,7 +118,7 @@ public class AccountController : Controller
             if (user == null)
             {
                 ModelState.AddModelError(nameof(LoginViewModel.Email), "Email or password is incorrect");
-                return BadRequest(ModelState);
+                return View("Error");
             }
 
             var result = await _signInManager.PasswordSignInAsync(
@@ -97,9 +132,13 @@ public class AccountController : Controller
                 _logger.LogInformation("User logged in.");
                 return RedirectToAction("Index", "Home");
             }
-
-            ModelState.AddModelError(string.Empty, "Email or password is incorrect");
+            else
+            {
+                ModelState.AddModelError("", "Invalid Login Attempt");
+                return View("ErrorEmailConfirmation");
+            }
         }
+
         return View(model);
     }
 
@@ -131,4 +170,100 @@ public class AccountController : Controller
         // !uploadSuccess = add showing error or smth??
         return RedirectToAction("UserProfile", "Account", model);
     }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult ForgotPassword()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult ForgotPasswordConfirmation()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult ResetPasswordConfirmation()
+    {
+        return View();
+    }
+    [HttpGet]
+    public IActionResult ResetPassword(string token, string email)
+    {
+        var model = new ResetPassword { Token = token, Email = email };
+        return View(model);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null && await _userManager.IsEmailConfirmedAsync(user))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                var passwordResetLink = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme);
+
+                _logger.Log(LogLevel.Warning, passwordResetLink);
+
+
+                var message = new Message(user.Email, "Reset password", passwordResetLink);
+
+                _emailSender.SendEmail(message);
+
+
+                return View("ForgotPasswordConfirmation");
+            }
+
+            return View("ForgotPasswordConfirmation");
+        }
+
+        return View(model);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult ResetPasswordModel(string token, string email)
+    {
+        // If password reset token or email is null, most likely the
+        // user tried to tamper the password reset link
+        if (token == null || email == null)
+        {
+            ModelState.AddModelError(" ", "Invalid password reset token");
+        }
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword(ResetPassword model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user != null)
+            {
+                var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    return View("ResetPasswordConfirmation");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(" ", error.Description);
+                }
+                return View(model);
+            }
+
+            return View("ResetPasswordConfirmation");
+        }
+        return View(model);
+    }
+
 }

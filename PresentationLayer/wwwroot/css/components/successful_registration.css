@@ -1,0 +1,21 @@
+﻿
+
+.successful-registration-wrapper {
+    height: 100%;
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.succesful-background {
+    background-image: url(/images/successful-registration.jpg);
+    height: 410px;
+    width: 400px;
+    background-repeat: no-repeat;
+    background-position: center;
+}

@@ -18,7 +18,7 @@ namespace DAL.Init
 
             if (await userManager.FindByNameAsync(adminEmail) == null)
             {
-                User admin = new User
+                User admin = new()
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
