@@ -1,11 +1,16 @@
+using System.Configuration;
 using BLL.Service;
 using BLL.Service.impl;
 using DAL.DataContext;
+using DAL.Init;
 using DAL.Model;
 using DAL.Repository;
 using DAL.Repository.impl;
+using EmailSender;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using PresentationLayer.CustomTokenProviders;
 using PresentationLayer.Mappings;
 using Serilog;
 
@@ -26,9 +31,9 @@ builder.Services.AddScoped<IPetPostImageService, PetPostImageService>();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-connectionString = connectionString!.Replace("DbPassword", builder.Configuration["DbPassword"]);
+connectionString = connectionString!.Replace("1", builder.Configuration["1"]);
 
-builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+builder.Services.AddDefaultIdentity<User>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireLowercase = false;
@@ -36,12 +41,31 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
         options.Password.RequireUppercase = false;
         options.Password.RequiredLength = 3;
         options.Password.RequiredUniqueChars = 0;
+
+        options.User.RequireUniqueEmail = true;
+        options.SignIn.RequireConfirmedEmail = true;
+        options.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
     })
+    .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<FindYourPetContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation");
+
+
+var emailConfig = builder.Configuration.GetSection("EmailConfiguration")
+  .Get<EmailConfiguration>();
+
+builder.Services.AddSingleton(emailConfig);
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.Configure<PasswordHasherOptions>(options =>
     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2);
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+   options.TokenLifespan = TimeSpan.FromHours(2));
+builder.Services.Configure<EmailConfirmationTokenProviderOptions>(options =>
+    options.TokenLifespan = TimeSpan.FromDays(3));
+
+
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -67,6 +91,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var rolesManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    await RoleInitializer.InitializeAsync(userManager, rolesManager, app.Configuration);
 }
 
 app.UseHttpsRedirection();
