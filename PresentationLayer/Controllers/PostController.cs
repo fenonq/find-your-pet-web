@@ -51,8 +51,7 @@ public class PostController : Controller
     }
 
     [HttpGet]
-    //[AllowAnonymous]
-    [Authorize(Roles = "admin")] // to test roles
+    [AllowAnonymous]
 
     public IActionResult AllPosts(string sortOrder)
     {
