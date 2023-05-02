@@ -31,7 +31,7 @@ builder.Services.AddScoped<IPetPostImageService, PetPostImageService>();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-connectionString = connectionString!.Replace("1", builder.Configuration["1"]);
+//connectionString = connectionString!.Replace("123456", builder.Configuration["1"]);
 
 builder.Services.AddDefaultIdentity<User>(options =>
     {
@@ -51,7 +51,6 @@ builder.Services.AddDefaultIdentity<User>(options =>
     .AddDefaultTokenProviders()
     .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation");
 
-
 var emailConfig = builder.Configuration.GetSection("EmailConfiguration")
   .Get<EmailConfiguration>();
 
@@ -64,8 +63,6 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
    options.TokenLifespan = TimeSpan.FromHours(2));
 builder.Services.Configure<EmailConfirmationTokenProviderOptions>(options =>
     options.TokenLifespan = TimeSpan.FromDays(3));
-
-
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

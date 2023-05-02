@@ -3,13 +3,8 @@ using DAL.Model;
 using EmailSender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PresentationLayer.Models;
-using System.Security.Cryptography;
-using static Org.BouncyCastle.Math.EC.ECCurve;
-
 
 namespace PresentationLayer.Controllers;
 
@@ -20,7 +15,6 @@ public class AccountController : Controller
     private readonly ILogger<AccountController> _logger;
     private readonly IImageService _imageService;
     private readonly IEmailService _emailSender;
-
 
     public AccountController(
         UserManager<User> userManager,
@@ -58,16 +52,14 @@ public class AccountController : Controller
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
-                var userEmail = await _userManager.Users.FirstOrDefaultAsync(a => a.Email == user.Email);
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
 
                 var message = new Message(user.Email, "Completed!", confirmationLink);
 
-                _emailSender.SendEmail(message);
-
-
-                return View("ErrorRegistration");
+                var successSend = await _emailSender.SendEmail(message);
+                return successSend ? View("Info", new UserInfo("Registration successful!", "Please confirm your email, by clicking on the confirmation link we emailed you"))
+                                        : View("Error");
             }
 
             foreach (var error in result.Errors)
@@ -80,27 +72,29 @@ public class AccountController : Controller
         return View(model);
     }
 
-
     [HttpGet]
     [AllowAnonymous]
-
     public async Task<IActionResult> ConfirmEmail(string token, string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        if (user == null)
+        if (user != null)
         {
-            return View("Error");
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return View("Info", new UserInfo("Welcome in our team!", "Thank you for confirming your email"));
+            }
         }
 
-        var result = await _userManager.ConfirmEmailAsync(user, token);
-        return View(result.Succeeded ? nameof(ConfirmEmail) : "Error");
+        return View("Error");
     }
 
-    [HttpGet]
+    /*[HttpGet]
     public IActionResult SuccessRegistration()
     {
         return View();
-    }
+    }*/
 
     [HttpGet]
     public IActionResult Login()
@@ -135,7 +129,7 @@ public class AccountController : Controller
             else
             {
                 ModelState.AddModelError("", "Invalid Login Attempt");
-                return View("ErrorEmailConfirmation");
+                return View("Error");
             }
         }
 
@@ -178,24 +172,6 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpGet]
-    public IActionResult ForgotPasswordConfirmation()
-    {
-        return View();
-    }
-
-    [HttpGet]
-    public IActionResult ResetPasswordConfirmation()
-    {
-        return View();
-    }
-    [HttpGet]
-    public IActionResult ResetPassword(string token, string email)
-    {
-        var model = new ResetPassword { Token = token, Email = email };
-        return View(model);
-    }
-
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
@@ -210,23 +186,25 @@ public class AccountController : Controller
                 var passwordResetLink = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme);
 
                 _logger.Log(LogLevel.Warning, passwordResetLink);
-
-
                 var message = new Message(user.Email, "Reset password", passwordResetLink);
 
-                _emailSender.SendEmail(message);
-
-
-                return View("ForgotPasswordConfirmation");
+                var successSend = await _emailSender.SendEmail(message);
+                return successSend ? View("Info", new UserInfo("The final steps!", "We have sent an email with the instructions to reset your password")) : View("Error");
             }
 
-            return View("ForgotPasswordConfirmation");
+            return View("Error");
         }
 
         return View(model);
     }
 
     [HttpGet]
+    public IActionResult ForgotPasswordConfirmation()
+    {
+        return View();
+    }
+
+    /*[HttpGet]
     [AllowAnonymous]
     public IActionResult ResetPasswordModel(string token, string email)
     {
@@ -236,8 +214,9 @@ public class AccountController : Controller
         {
             ModelState.AddModelError(" ", "Invalid password reset token");
         }
+
         return View();
-    }
+    }*/
 
     [HttpPost]
     [AllowAnonymous]
@@ -254,16 +233,32 @@ public class AccountController : Controller
                 {
                     return View("ResetPasswordConfirmation");
                 }
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(" ", error.Description);
                 }
+
                 return View(model);
             }
 
-            return View("ResetPasswordConfirmation");
+            return View("Error");
         }
+
         return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult ResetPassword(string token, string email)
+    {
+        var model = new ResetPassword { Token = token, Email = email };
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult ResetPasswordConfirmation()
+    {
+        return View();
     }
 
 }
