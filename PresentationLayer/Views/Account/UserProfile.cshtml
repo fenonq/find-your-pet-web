@@ -3,7 +3,7 @@
     ViewData["Title"] = "Account";
 }
 
-<h1>Personal Account</h1>
+@*<h1>Personal Account</h1>
 <div class="container">
     <div class="id">
         <label>Id:</label>
@@ -39,4 +39,35 @@
             <button type="submit" class="btn btn-success">Upload File</button>
         </div>
     </div>
-</form>
+</form>*@
+
+<div class="post-wrapper">
+    <div class="profile post-content">
+        <img class="profile-image" src="@Model.PhotoPath" alt="User Photo">
+        <div class="profile-details">
+            <h1 class="name">@Model.Name @Model.Surname</h1>
+            <p class="email">@Model.Email</p>
+
+            
+            <form asp-action="UploadUserPhoto" asp-controller="Account" method="post" enctype="multipart/form-data">
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label class="col-form-label">Select File</label>
+                        <input asp-for=@Model.Photo class="form-control" />
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <button type="submit" class="btn button">Upload File</button>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+
+        <div class="profile-photo-upload">
+            
+        </div>
+        
+    </div>
+</div>

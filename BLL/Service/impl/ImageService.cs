@@ -63,7 +63,7 @@ public class ImageService : IImageService
     {
         var path = Path.Combine(_webHostEnvironment.WebRootPath, "userPhotos", user.Id + ".png");
 
-        return System.IO.File.Exists(path) ? "/userPhotos/" + user.Id + ".jpg" :
+        return System.IO.File.Exists(path) ? "/userPhotos/" + user.Id + ".png" :
                                              "/userPhotos/" + "default.png";
     }
 }

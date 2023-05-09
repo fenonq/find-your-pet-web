@@ -6,8 +6,9 @@
 @import "components/registration.css";
 @import "components/login.css";
 @import "components/create_post.css";
+@import "components/profile.css"
 
-html {
+html{
   font-size: 14px;
 }
 
