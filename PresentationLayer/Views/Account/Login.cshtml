@@ -6,7 +6,7 @@
             <div class="col-md-6 contents">
                 <div class="row justify-content-center">
                     <div class="col-md-l no-margin-mobile">
-                        <form asp-action="Login" method="post">
+                        <form asp-action="Login" asp-controller="Account" method="post">
                             <div class="form-group login-form">
                                 <label asp-for="Email">Email:</label>
                                 <input asp-for="Email" class="form-control" />
@@ -26,14 +26,14 @@
                             </div>
                             <div>
                                 <button type="submit" class="btn button register-btn log-btn no-margin-mobile mobile">Login</button>
-                                <form asp-action="Registration" asp-controller="Account" method="get">
-                                    <button type="submit" class="btn button register-btn log-btn log-btn-r no-margin-mobile mobile">Register me</button>
-                                </form>
                             </div>
+                            
+                        </form>
+                        <form asp-action="Registration" asp-controller="Account" method="get">
+                            <button type="submit" class="btn button register-btn log-btn log-btn-r no-margin-mobile mobile">Register me</button>
                         </form>
 
                     </div>
-            
                 </div>
             </div>
             <div class="col-md-6">

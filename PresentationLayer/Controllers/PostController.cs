@@ -51,7 +51,9 @@ public class PostController : Controller
     }
 
     [HttpGet]
-    [AllowAnonymous]
+    //[AllowAnonymous]
+    [Authorize(Roles = "admin")] // to test roles
+
     public IActionResult AllPosts(string sortOrder)
     {
         _logger.LogInformation("Show AllPosts..");
