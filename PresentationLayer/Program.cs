@@ -9,6 +9,7 @@ using DAL.Repository.impl;
 using EmailSender;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using PresentationLayer.CustomTokenProviders;
 using PresentationLayer.Mappings;
@@ -21,14 +22,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IPetRepository, PetRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
-// builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IPetPostImageService, PetPostImageService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
+builder.Services.AddHttpContextAccessor();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 //connectionString = connectionString!.Replace("1", builder.Configuration["1"]);
@@ -55,7 +61,6 @@ var emailConfig = builder.Configuration.GetSection("EmailConfiguration")
   .Get<EmailConfiguration>();
 
 builder.Services.AddSingleton(emailConfig);
-builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.Configure<PasswordHasherOptions>(options =>
     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2);
@@ -97,6 +102,8 @@ using (var scope = app.Services.CreateScope())
     var rolesManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
     await RoleInitializer.InitializeAsync(userManager, rolesManager, app.Configuration);
 }
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
