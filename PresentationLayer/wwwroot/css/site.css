@@ -3,6 +3,8 @@
 @import "shared/buttons.css";
 @import "shared/default.css";
 @import "components/index.css";
+@import "components/registration.css";
+@import "components/login.css";
 
 html {
   font-size: 14px;

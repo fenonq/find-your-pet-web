@@ -1,24 +1,46 @@
 ﻿@model LoginViewModel
 
-<form asp-action="Login" method="post">
-    <div>
-        <label asp-for="Email">Email:</label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 contents">
+                <div class="row justify-content-center">
+                    <div class="col-md-l no-margin-mobile">
+                        <form asp-action="Login" method="post">
+                            <div class="form-group login-form">
+                                <label asp-for="Email">Email:</label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group login-form">
+                                <label asp-for="Password">Password:</label>
+                                <input asp-for="Password" type="password" class="form-control" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="RememberMe">Remember me?</label>
+                                <input asp-for="RememberMe" type="checkbox" />                                
+                            </div>
+                            <div>
+                                <a asp-action="ForgotPassword" class="forgot-link">Forgot Password?</a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn button register-btn log-btn no-margin-mobile mobile">Login</button>
+                                <form asp-action="Registration" asp-controller="Account" method="get">
+                                    <button type="submit" class="btn button register-btn log-btn log-btn-r no-margin-mobile mobile">Register me</button>
+                                </form>
+                            </div>
+                        </form>
+
+                    </div>
+            
+                </div>
+            </div>
+            <div class="col-md-6">
+                <img src="../../images/login.svg" alt="Welcome ..." class="img-fluid" />
+            </div>
+        </div>
     </div>
-    <div>
-        <label asp-for="Password">Password:</label>
-        <input asp-for="Password" type="password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <label asp-for="RememberMe">Remember me?</label>
-        <input asp-for="RememberMe" type="checkbox" />
-    </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-    <div>
-        <a asp-action="ForgotPassword">Forgot Password?</a>
-    </div>
-</form>
+</div>
+
+
