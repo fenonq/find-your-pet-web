@@ -6,6 +6,7 @@
     --component-border: 1px solid;
     --component-border-color: rgba(0, 0, 0, 0);
     --button-primary-color: #f49351;
+    --button-secondary-color: #bcbcbc;
     --button-primary-text-color: #FFFFFF;
     /* animation*/
     --defualt-animation: all 0.15s ease-in-out;
