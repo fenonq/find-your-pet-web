@@ -1,0 +1,33 @@
+﻿body {
+}
+
+.cr-form-group {
+    display: flex;
+}
+
+.cr-post-img {
+    margin-left: 80px;
+    margin-top: 40px
+}
+
+.cr-content {
+    display: grid;
+    grid-template-columns: 550px 250px 250px; /*300px 150px 150px;*/
+}
+
+.cr-post-content {
+    height: 550px;
+}
+
+.cr-label {
+    width: 150px;
+}
+
+.cr-title {
+    margin-left: 500px;
+}
+
+.cr-btn {
+    margin-left: 450px;
+    margin-top: 20px;
+}
