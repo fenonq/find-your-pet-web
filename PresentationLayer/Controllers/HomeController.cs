@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 
@@ -16,14 +18,6 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         _logger.LogInformation("Test information..");
-        // _userService.Add(new User
-        // {
-        //     Name = "test",
-        //     Surname = "test",
-        //     Login = "test",
-        //     Password = "test",
-        // });
-        // ViewBag.User = _userService.FindAll()[0].Name;
         return View();
     }
 

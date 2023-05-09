@@ -16,14 +16,14 @@ public class FindYourPetContext : IdentityDbContext<User, IdentityRole<int>, int
     {
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseNpgsql("Server=localhost;port=5432;user id=postgres;" +
-                                     "password=DbPassword;database=find-your-pet;");
+                                     "password=123456;database=find-your-pet;");
         }
-    }
+    }*/
 
     public virtual DbSet<Pet> Pets { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿
 
-.user-friendly-error-wrapper {
+.user-friendly-state-wrapper {
     height: 100%;
     width: 100%;
     background-color: #FFFFFF;
@@ -9,6 +9,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
 .server-error-background {
@@ -23,7 +24,7 @@
     position: relative;
 }
 
-.user-friendly-error-wrapper p {
+.user-friendly-state-wrapper p {
     margin-top: 1rem;
     color: #616161;
     text-align: center;
@@ -41,4 +42,17 @@
 .field-validation-error {
     color: red;
     font-size: 14px;
+}
+.user-friendly-state-wrapper img {
+    height: 55vh;
+}
+
+.user-friendly-state-wrapper .info-state {
+    height: 20vh;
+    text-align: center;
+}
+
+.user-friendly-state-wrapper .info-state h3{
+    color: #e2a203;
+    margin-bottom: 20px;
 }

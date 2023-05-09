@@ -51,7 +51,6 @@ builder.Services.AddDefaultIdentity<User>(options =>
     .AddDefaultTokenProviders()
     .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation");
 
-
 var emailConfig = builder.Configuration.GetSection("EmailConfiguration")
   .Get<EmailConfiguration>();
 
@@ -64,8 +63,6 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
    options.TokenLifespan = TimeSpan.FromHours(2));
 builder.Services.Configure<EmailConfirmationTokenProviderOptions>(options =>
     options.TokenLifespan = TimeSpan.FromDays(3));
-
-
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
