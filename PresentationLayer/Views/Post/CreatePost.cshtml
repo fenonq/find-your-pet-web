@@ -5,46 +5,53 @@
     <div class="post-content cr-post-content">
         <div class=" cr-content">
             <form asp-controller="Post" asp-action="CreatePost" method="post" enctype="multipart/form-data">
-                <div class="form-group cr-form-group">
-                    <label asp-for="Pet.Name" class="cr-label">Pet Name:</label>
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Pet.Name" class="cr-label">Pet name:</label>
                     <input asp-for="Pet.Name" class="form-control" />
+                    <span asp-validation-for="Pet.Name" class="text-danger"></span>
                 </div>
-                <div class="form-group cr-form-group">
-                    <label asp-for="Pet.Age" class="cr-label">Pet Age:</label>
-                    <input asp-for="Pet.Age" class="form-control" />
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Pet.Age" class="cr-label">Pet age:</label>
+                    <input asp-for="Pet.Age" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="Pet.Age" class="text-danger"></span>
                 </div>
 
-                <div class="form-group cr-form-group">
-                    <label asp-for="Pet.Description" class="cr-label">Pet Description:</label>
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Pet.Description" class="cr-label">Pet description:</label>
                     <textarea asp-for="Pet.Description" class="form-control" required></textarea>
+                    <span asp-validation-for="Pet.Description" class="text-danger"></span>
                 </div>
 
-                <div class="form-group cr-form-group">
-                    <label asp-for="Post.Date" class="cr-label">Lost Date:</label>
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Post.Date" class="cr-label">Lost date:</label>
                     <input asp-for="Post.Date" type="date" class="form-control" required />
+                    <span asp-validation-for="Post.Date" class="text-danger"></span>
                 </div>
 
-                <div class="form-group cr-form-group">
+                <div class="form-group cr-form-group position-relative">
                     <label asp-for="Post.Location" class="cr-label">Location:</label>
                     <input asp-for="Post.Location" class="form-control" required />
+                    <span asp-validation-for="Post.Location" class="text-danger"></span>
                 </div>
 
-                <div class="form-group cr-form-group">
-                    <label asp-for="Post.ContactNumber" class="cr-label">Contact Number:</label>
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Post.ContactNumber" class="cr-label">Contact number:</label>
                     <input asp-for="Post.ContactNumber" class="form-control" required />
+                    <span asp-validation-for="Post.ContactNumber" class="text-danger"></span>
                 </div>
 
-                <div class="form-group cr-form-group">
-                    <label asp-for="Post.Type" class="cr-label">Post Type:</label>
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Post.Type" class="cr-label">Post type:</label>
                     <select asp-for="Post.Type" class="form-control" required>
                         <option value="Found">Found</option>
                         <option value="Lost">Lost</option>
                     </select>
                 </div>
 
-                <div class="form-group cr-form-group">
-                    <label asp-for="Post.Photo" class="cr-label">Pet Photo:</label>
-                    <input type="file" asp-for="Post.Photo" class="form-control-file" required />
+                <div class="form-group cr-form-group position-relative">
+                    <label asp-for="Post.Photo" class="cr-label">Pet photo:</label>
+                    <input type="file" asp-for="Post.Photo" class="form-control-file">
+                    <span asp-validation-for="Post.Photo" class="text-danger"></span>
                 </div>
 
                 <button type="submit" class="btn button cr-btn">Create Post</button>

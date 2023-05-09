@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BLL.Service;
+using BLL.Service.impl;
 using DAL.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -41,13 +42,18 @@ public class PostController : Controller
     [HttpPost]
     public async Task<IActionResult> CreatePost(PetPostImageViewModel model)
     {
-        _logger.LogInformation("Creating post..");
-        var pet = _mapper.Map<Pet>(model.Pet);
-        var post = _mapper.Map<Post>(model.Post);
-        var user = await _userManager.GetUserAsync(User);
-        _petPostImageService.AddPetPostImage(post, pet, user.Id, model.Post.Photo);
-        _logger.LogInformation("Post successfully created");
-        return RedirectToAction("Index", "Home");
+        if (ModelState.IsValid)
+        {
+            _logger.LogInformation("Creating post..");
+            var pet = _mapper.Map<Pet>(model.Pet);
+            var post = _mapper.Map<Post>(model.Post);
+            var user = await _userManager.GetUserAsync(User);
+            _petPostImageService.AddPetPostImage(post, pet, user.Id, model.Post.Photo);
+            _logger.LogInformation("Post successfully created");
+            return RedirectToAction("AllPosts", "Post");
+        }
+
+        return View(model);
     }
 
     [HttpGet]

@@ -56,3 +56,32 @@
     color: #e2a203;
     margin-bottom: 20px;
 }
+.user-friendly-state-wrapper.processing {
+    height: 75vh;
+    gap: 1rem;
+}
+
+.user-friendly-state-wrapper.processing img {
+    height: unset;
+    width: 50%;
+    margin-top: -40px;
+}
+
+.user-friendly-state-wrapper.processing form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 300px;
+}
+
+.user-friendly-state-wrapper.processing .button {
+    margin-right: 0;
+    align-self: center;
+}
+
+@media(max-width: 900px){
+    .user-friendly-state-wrapper.processing form {
+        min-width: 220px !important;
+        max-width: 250px;
+    }
+}

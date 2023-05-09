@@ -17,20 +17,7 @@
     background: inherit;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 1px;
 }
-#sortOrder > option:checked,
-#sortOrder > option:hover {
-    background-color: yellow!important;
-}
-#sortOrder:focus > option:hover {
-    box-shadow: 0 0 10px 100px green inset;
-    background: #000 !important;
-}
-select:hover {
-    background-color: green;
-}
-select {
-    background: #ffea00;
-}
+
 .post-content {
     position: relative;
     display: flex;
