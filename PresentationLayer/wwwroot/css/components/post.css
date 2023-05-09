@@ -1,9 +1,42 @@
-﻿.post-content {
+﻿.tools-box {
+    border-bottom: 1px solid #a9a8a7e8;
+    margin-bottom: 35px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: end;
+}
+.tools-box > *{
+    display: inline;
+}
+.tools-box > p{
+    margin-right: 20px;
+}
+.tools-box select{
+    border: none;
+    border-radius: 10px;
+    background: inherit;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 1px;
+}
+#sortOrder > option:checked,
+#sortOrder > option:hover {
+    background-color: yellow!important;
+}
+#sortOrder:focus > option:hover {
+    box-shadow: 0 0 10px 100px green inset;
+    background: #000 !important;
+}
+select:hover {
+    background-color: green;
+}
+select {
+    background: #ffea00;
+}
+.post-content {
     position: relative;
     display: flex;
     align-items: center;
     padding: 1rem;
-    height: 60vh;
+    height: 75vh;
     justify-content: space-between;
     box-shadow: 0px 5px 10px 2px rgb(0,0,0, 0.2);
     border-radius: 10px;
@@ -74,4 +107,92 @@
     opacity: 0.8;
     width: 20%;
 }
+.posts-preview {
+    display: flex;
+    overflow-x: hidden;
+    max-width: 76vw;
+}
+.posts-preview .post-card {
+    width: 300px;
+}
+.posts-preview .post-card img{
+    width: 200px;
+}
+.card {
+    position: relative;
+    border-radius: 20px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.card::before {
+    content: "";
+    background-size: cover;
+    background-image: url(/images/background-lost.svg);
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    border-radius: inherit;
+    opacity: 0.40;
+}
+.card.Found::before {
+    background-image: url(/images/background-found.svg);
+}
+.card li {
+    border: none;
+    background: none;
+    background-color: none;
+    padding: 2px 1rem;
+}
+.card .card-body:first-of-type{
+    min-height: 80px;
+}
+.card > img {
+    clip-path: circle();
+    max-height: 140px;
+    margin-top: -75px;
+}
+.card > .pet-photo {
+    width: 180px;
+    position: relative;
+    align-self: center;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-top: -20px;
+}
+.card .pet-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.card-body{
+    padding: 0;
+}
+.card > .list-group {
+    border: none;
+}
+.card .pet-info {
+    position: relative;
+    background-color: rgb(255, 255, 255, 0.3);
+    border-radius: 20px;
+    margin: 10px;
+    padding: 5px 0;
+    box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 1px 0px;
+}
+.card .button {
+    left: 32%;
+    right: auto;
+    bottom: 2px;
+}
 
+@media(max-width: 1380px){
+    .container .row {
+        justify-content: space-evenly;
+    }
+}
+@media(max-width: 700px){
+    .card .button {
+        left: 30%;
+    }
+}
