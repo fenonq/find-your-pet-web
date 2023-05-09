@@ -20,7 +20,7 @@
 }
 
 .cr-label {
-    width: 150px;
+    width: 170px;
 }
 
 .cr-title {
@@ -30,4 +30,9 @@
 .cr-btn {
     margin-left: 450px;
     margin-top: 20px;
+}
+
+.form-group.cr-form-group.position-relative .text-danger {
+    position: absolute;
+    bottom: 0;
 }
