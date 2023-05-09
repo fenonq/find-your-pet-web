@@ -31,7 +31,7 @@ builder.Services.AddScoped<IPetPostImageService, PetPostImageService>();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//connectionString = connectionString!.Replace("123456", builder.Configuration["1"]);
+//connectionString = connectionString!.Replace("1", builder.Configuration["1"]);
 
 builder.Services.AddDefaultIdentity<User>(options =>
     {

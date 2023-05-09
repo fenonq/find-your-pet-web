@@ -1,0 +1,36 @@
+﻿body {
+}
+
+.col-md-l {
+    margin-top: 150px;
+    max-width: 450px;
+}
+
+.log-btn {
+    display: inline-block;
+}
+
+.forgot-link {
+    color: orange;
+}
+
+.form-control {
+    display: inline-block;
+}
+
+.log-btn-r {
+    margin-top: -63px;
+    float: right;
+}
+
+@media (max-width: 480px) {
+    .no-margin-mobile {
+        margin-top: 20px;
+    }
+
+    .mobile {
+        display: block;
+        float: initial;
+        margin-top: 25px;
+    }
+}

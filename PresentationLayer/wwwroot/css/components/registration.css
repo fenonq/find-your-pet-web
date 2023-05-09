@@ -1,0 +1,19 @@
+﻿.img-fluid {
+    max-width: 130%;
+    height: auto;
+    margin-top: 90px;
+    padding-right: 90px;
+}
+
+.registration-container {
+    margin-top: 60px;
+}
+
+.form-group {
+    margin-top: 10px;
+}
+
+.register-btn {
+    display: block;
+    margin: 15px auto;
+}
