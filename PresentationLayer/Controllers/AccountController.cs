@@ -15,19 +15,22 @@ public class AccountController : Controller
     private readonly ILogger<AccountController> _logger;
     private readonly IImageService _imageService;
     private readonly IEmailService _emailSender;
+    private readonly IUserService _userService;
 
     public AccountController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ILogger<AccountController> logger,
         IImageService imageService,
-        IEmailService emailSender)
+        IEmailService emailSender,
+        IUserService userService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger;
         _imageService = imageService;
         _emailSender = emailSender;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -48,25 +51,10 @@ public class AccountController : Controller
                 Name = model.Name,
                 Surname = model.Surname,
             };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User created a new account with password.");
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email }, Request.Scheme);
+            var result = await _userService.RegistrateUser(user, model.Password);
 
-                var message = new Message(user.Email, "Completed!", confirmationLink);
-
-                var successSend = await _emailSender.SendEmail(message);
-                return successSend ? View("Info", new UserInfo("Registration successful!", "Please confirm your email, by clicking on the confirmation link we emailed you"))
-                                        : View("Error");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-                _logger.LogInformation("Error creating user: " + error.Description);
-            }
+            return result ? View("Info", new UserInfo("Registration successful!", "Please confirm your email, by clicking on the confirmation link we emailed you"))
+                          : View("Error");
         }
 
         return View(model);
@@ -76,25 +64,15 @@ public class AccountController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> ConfirmEmail(string token, string email)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user != null)
+        var result = await _userService.ConfirmEmail(email, token);
+        if (result)
         {
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return View("Info", new UserInfo("Welcome in our team!", "Thank you for confirming your email"));
-            }
+            var user = await _userManager.FindByEmailAsync(email);
+            return View("Info", new UserInfo("Welcome in our team!", "Thank you for confirming your email"));
         }
 
         return View("Error");
     }
-
-    /*[HttpGet]
-    public IActionResult SuccessRegistration()
-    {
-        return View();
-    }*/
 
     [HttpGet]
     public IActionResult Login()
@@ -107,30 +85,8 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
-            if (user == null)
-            {
-                ModelState.AddModelError(nameof(LoginViewModel.Email), "Email or password is incorrect");
-                return View("Error");
-            }
-
-            var result = await _signInManager.PasswordSignInAsync(
-                model.Email,
-                model.Password,
-                model.RememberMe,
-                lockoutOnFailure: false);
-
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User logged in.");
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                ModelState.AddModelError("", "Invalid Login Attempt");
-                return View("Error");
-            }
+            var result = await _userService.LoginUser(model.Email, model.Password, model.RememberMe);
+            return result ? RedirectToAction("Index", "Home") : View("Error");
         }
 
         return View(model);
@@ -149,7 +105,11 @@ public class AccountController : Controller
     public async Task<IActionResult> UserProfile()
     {
         var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-        currentUser.PhotoPath = _imageService.GetUserImage(currentUser);
+
+        if (currentUser != null)
+        {
+            currentUser.PhotoPath = _imageService.GetUserImage(currentUser);
+        }
 
         _logger.LogInformation("Show account..");
         return View(currentUser);
@@ -161,7 +121,6 @@ public class AccountController : Controller
     {
         var currentUser = await _userManager.GetUserAsync(HttpContext.User);
         var uploadSuccess = _imageService.UploadUserPhoto(currentUser, model.Photo);
-        // !uploadSuccess = add showing error or smth??
         return RedirectToAction("UserProfile", "Account", model);
     }
 
@@ -178,21 +137,8 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null && await _userManager.IsEmailConfirmedAsync(user))
-            {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-                var passwordResetLink = Url.Action(nameof(ResetPassword), "Account", new { email = user.Email, token }, Request.Scheme);
-
-                _logger.Log(LogLevel.Warning, passwordResetLink);
-                var message = new Message(user.Email, "Reset password", passwordResetLink);
-
-                var successSend = await _emailSender.SendEmail(message);
-                return successSend ? View("Info", new UserInfo("The final steps!", "We have sent an email with the instructions to reset your password")) : View("Error");
-            }
-
-            return View("Error");
+            var result = await _userService.ForgotPassword(model.Email);
+            return result ? View("Info", new UserInfo("The final steps!", "We have sent an email with the instructions to reset your password")) : View("Error");
         }
 
         return View(model);
@@ -204,45 +150,14 @@ public class AccountController : Controller
         return View();
     }
 
-    /*[HttpGet]
-    [AllowAnonymous]
-    public IActionResult ResetPasswordModel(string token, string email)
-    {
-        // If password reset token or email is null, most likely the
-        // user tried to tamper the password reset link
-        if (token == null || email == null)
-        {
-            ModelState.AddModelError(" ", "Invalid password reset token");
-        }
-
-        return View();
-    }*/
-
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword(ResetPassword model)
     {
         if (ModelState.IsValid)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
-            if (user != null)
-            {
-                var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
-                if (result.Succeeded)
-                {
-                    return View("ResetPasswordConfirmation");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(" ", error.Description);
-                }
-
-                return View(model);
-            }
-
-            return View("Error");
+            var result = await _userService.ResetPassword(model.Email, model.Token, model.Password);
+            return result ? View("ResetPasswordConfirmation") : View("Error");
         }
 
         return View(model);
