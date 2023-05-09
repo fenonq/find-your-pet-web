@@ -54,12 +54,12 @@
             
             <form asp-action="UploadUserPhoto" asp-controller="Account" method="post" enctype="multipart/form-data">
                 <div class="row mt-2">
-                    <div class="col-12">
+                    <div class="col-12 mobile">
                         <label class="col-form-label">Select File</label>
                         <input asp-for=@Model.Photo class="form-control" />
                     </div>
                 </div>
-                <div class="row mt-2">
+                <div class="row mt-2 mobile">
                     <div class="col-12">
                         <button type="submit" class="btn button">Upload File</button>
                     </div>
