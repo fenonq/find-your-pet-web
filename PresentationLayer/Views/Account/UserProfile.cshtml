@@ -42,9 +42,12 @@
 </form>*@
 
 <div class="post-wrapper">
-    <div class="profile post-content">
-        <img class="profile-image" src="@Model.PhotoPath" alt="User Photo">
-        <div class="profile-details">
+    <div class="profile post-content no-margin-mobile">
+        <div class="img-d">
+            <img class="profile-image mobile-img mobile" src="@Model.PhotoPath" alt="User Photo">
+        </div>
+        
+        <div class="profile-details mobile">
             <h1 class="name">@Model.Name @Model.Surname</h1>
             <p class="email">@Model.Email</p>
 

@@ -22,7 +22,6 @@
     margin-top: -63px;
     float: right;
 }
-
 @media (max-width: 480px) {
     .no-margin-mobile {
         margin-top: 20px;
@@ -32,6 +31,23 @@
         display: block;
         float: initial;
         margin-top: 25px;
+    }
+
+    .profile {
+        display: block;
+    }
+
+    .profile-image {
+        max-width: 300px !important;
+        max-height: 220px !important;
+    }
+
+    .name {
+        margin-left: 20%;
+    }
+
+    .email {
+        margin-left: 30%;
     }
 }
 
