@@ -95,7 +95,7 @@ public class PostController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles="ADMIN")]
+    [Authorize(Roles="admin")]
     public IActionResult Delete(int id)
     {
         _logger.LogInformation("Deleting post..");

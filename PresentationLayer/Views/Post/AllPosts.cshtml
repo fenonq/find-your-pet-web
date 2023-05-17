@@ -18,7 +18,7 @@
     <div class="row" data-masonry='{"horizontalOrder": true }'>
         @foreach (var petPost in Model)
         {
-            <div class="col-4 mb-5" style="min-width: 22rem">
+            <div class="col-4 mb-5 card-wrapper">
                 <div class="card @(petPost.Post.Type)" style="width: 22rem;">
                 <div class="pet-photo">
                     <img src="@(string.IsNullOrEmpty(petPost.Image.Path) ? "../images/pet-default.jpg" : petPost.Image.Path)" alt="Pet Photo">

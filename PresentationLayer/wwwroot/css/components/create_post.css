@@ -36,3 +36,34 @@
     position: absolute;
     bottom: 0;
 }
+
+@media(max-width: 700px){
+    .cr-title{
+        margin: 0;
+        display: none;
+    }
+    .cr-form-group{
+        flex-direction: column;
+    }
+    .cr-post-content {
+        height: 570px;
+    }
+    .cr-content .form-group {
+        margin-top: 0;
+        max-width: 335px;
+    }
+    .form-group.cr-form-group img{
+        display: none;
+    }
+    .cr-btn {
+        margin-left: 0;
+        margin-top: 2px;
+    }
+    .cr-content,
+    .cr-post-content{
+        display: block;
+    }
+    .cr-content form div:last-of-type{
+         text-align-last: center;
+    }
+}

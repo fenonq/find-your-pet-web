@@ -105,6 +105,9 @@
 .posts-preview .post-card img{
     width: 200px;
 }
+.card-wrapper{
+    min-width: 22rem;
+}
 .card {
     position: relative;
     border-radius: 20px;
@@ -177,9 +180,29 @@
     .container .row {
         justify-content: space-evenly;
     }
+    .card-wrapper{
+        min-width: 24rem;
+    }
 }
 @media(max-width: 700px){
     .card .button {
-        left: 30%;
+        left: 28%;
+        bottom: -7px;
+        background-color: rgb(255, 255, 255, 0.9);
+        color: var(--button-primary-color);
+        line-height: 1.5;
+    }
+    .post-wrapper .post-content {
+        flex-direction: column;
+    }
+    .post-wrapper.post-content img {
+        width: 220px;
+        height: 250px;
+    }
+    .post-content .post-info {
+        width: 100%;    
+    }
+    .post-content .contact-button {
+        left: 28%;
     }
 }

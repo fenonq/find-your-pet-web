@@ -31,11 +31,15 @@
     .no-margin-mobile {
         margin-top: 20px;
     }
+    .post-content img {
+        width: 250px;
+        height: 250px;
+        text-align: center;
+    }
 
     .mobile {
         display: block;
         float: initial;
-        margin-top: 25px;
     }
 
     .profile {
@@ -53,6 +57,9 @@
 
     .email {
         margin-left: 30%;
+    }
+    .img-d {
+        text-align: -webkit-center;
     }
 }
 
