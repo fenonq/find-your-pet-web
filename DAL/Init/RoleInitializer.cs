@@ -24,6 +24,7 @@ namespace DAL.Init
                     Email = adminEmail,
                     Name = "Admin",
                     Surname = "Admin",
+                    EmailConfirmed = true,
                 };
                 IdentityResult result = await userManager.CreateAsync(admin, password);
                 if (result.Succeeded)
