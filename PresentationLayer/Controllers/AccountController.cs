@@ -144,12 +144,6 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpGet]
-    public IActionResult ForgotPasswordConfirmation()
-    {
-        return View();
-    }
-
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword(ResetPassword model)
